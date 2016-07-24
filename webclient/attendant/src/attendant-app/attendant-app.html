@@ -6,6 +6,8 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
+<script src="script/properties.js"></script>
+
 <dom-module id="attendant-app">
   <template>
     <style>
@@ -21,22 +23,15 @@
         margin : 10px 10px;
       }
       .slot{
-<<<<<<< HEAD
         width : 120px;
         height : 180px;
         background-color: #A6D971;
-=======
-        width : 100px;
-        height : 150px;
-        background-color: yellow;
->>>>>>> parent of 02f45aa... Woojin changed
         border-style: solid;
         border-width: 2px;
         border-color: black;
         border-radius: 5px;
         display: inline-block;
       }
-<<<<<<< HEAD
       .slot.state_t{
         background-color: #E8553F;
       }
@@ -49,13 +44,11 @@
       #atd_img{
         width : 400px;
       }
-=======
->>>>>>> parent of 02f45aa... Woojin changed
     </style>
 
     <iron-ajax
         id = "authAjax"
-        url="http://128.237.190.60:4567/api/attendant/authentication"
+        url="{{ip}}/api/attendant/authentication"
         handle-as="json"
         method="post"
         on-response="authResponse"
@@ -65,13 +58,12 @@
     <iron-ajax
         auto
         id = "monitorAjax"
-        url="http://128.237.190.60:4567/api/attendant/monitor"
+        url="{{ip}}/api/attendant/monitor"
         handle-as="json"
         last-response="{{monitor}}">
     </iron-ajax>
 
     <div id="app">
-<<<<<<< HEAD
 
       <paper-card id="atd_img" image="imgs/surepark.jpg">
         <div class="card-content">
@@ -79,8 +71,6 @@
         </div>
       </paper-card>
 
-=======
->>>>>>> parent of 02f45aa... Woojin changed
       <paper-card>
         <div class="card-content">
           Attendant Check In
@@ -104,7 +94,6 @@
             <b>Server Dead!</b>
           </template>
         </div>
-<<<<<<< HEAD
 
         <div class="card-actions">
           <template is="dom-repeat" items="{{monitor}}">
@@ -129,17 +118,6 @@
                 </div>
               </div>
             </template>
-=======
-        <div class="card-actions">
-          <template is="dom-repeat" items="{{monitor}}">
-            <div class="slot">
-              <div role="listbox">
-                <paper-item>ID : {{item.parkingfacility_id}}</paper-item>
-                <paper-item>Floor : {{item.parkingslot_floor}}</paper-item>
-                <paper-item>Zone : {{item.parkingslot_zone}}</paper-item>
-              </div>
-            </div>
->>>>>>> parent of 02f45aa... Woojin changed
 
           </template>
 
@@ -174,9 +152,12 @@
           type: String,
           value: 'attendant-app',
         },
+        ip : String
       },
       ready : function(){
         // Monitor every 2 seconds
+        // console.log(properties.ip);
+        this.ip = properties.ip;
         this.set('interval', setInterval(this.interval.bind(this), 2000));
       },
       submitRsvNum: function(){
@@ -198,14 +179,11 @@
       },
       interval : function(){
         this.$.monitorAjax.generateRequest();
-<<<<<<< HEAD
       },
       pstatus : function(item){
         var result = (item === true);
         console.log(result);
         return result;
-=======
->>>>>>> parent of 02f45aa... Woojin changed
       }
 
     });

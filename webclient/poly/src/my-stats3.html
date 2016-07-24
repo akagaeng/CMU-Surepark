@@ -157,7 +157,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         month = date[1];
         day = date[2];
         // console.log(year, month, day);
-        this.$.statsAjax1.params = {"token":token,"year":year, "month":month, "day":day, "type":"d"};
+        this.$.statsAjax1.params = {"token":this.token,"year":year, "month":month, "day":day, "type":"d"};
 
         this.$.statsAjax1.generateRequest();
 
@@ -170,7 +170,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         month = date[1];
         day = date[2];
         // console.log(year, month, day);
-        this.$.statsAjax2.params = {"token":token,"year":year, "month":month, "day":day, "type":"m"};
+        this.$.statsAjax2.params = {"token":this.token,"year":year, "month":month, "day":day, "type":"m"};
 
         this.$.statsAjax2.generateRequest();
 
@@ -178,7 +178,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       stat01_response: function(request){
         // Chartjs
         var response = this.$.statsAjax1.lastResponse;
-<<<<<<< HEAD
         var length = response.length;
 
         var labels = [];
@@ -223,29 +222,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // var map = this.$.chart1;
         // map.setAttribute('type', 'column');
         // map.setAttribute('data', dataFrame);
-=======
-        if(response){
-          var length = response.length;
-          console.log(length);
-
-          var dataFrame = '[ ["Day", "Usage"]';
-          var cnt = 0;
-          response.forEach(function(entry){
-            // var h = i+1;
-            cnt += 1;
-            dataFrame += ',["'+ entry.slot.parkingslot_id +'", '+entry.count+']';
-          });
-
-          dataFrame = dataFrame + ' ]';
-          console.log(dataFrame);
-
-          var map = this.$.chart1;
-          map.setAttribute('type', 'column');
-          map.setAttribute('data', dataFrame);
-        }else{
-
-        }
->>>>>>> parent of 02f45aa... Woojin changed
 
 
       },
@@ -262,7 +238,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           data.push(entry.count);
         });
 
-<<<<<<< HEAD
         var BarChart = {
             labels: labels,
             datasets: [
@@ -296,20 +271,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // map.setAttribute('type', 'column');
         // map.setAttribute('data', dataFrame);
 
-=======
-        dataFrame = dataFrame + ' ]';
-        console.log(dataFrame);
-
-
-        var map = this.$.chart2;
-        map.setAttribute('type', 'column');
-        map.setAttribute('data', dataFrame);
-        // map.setAttribute('data', '[ ["Month", "Usage"],\
-        // ["s1", '+s1+'],\
-        // ["s2", '+s2+'],\
-        // ["s3", '+s3+'],\
-        // ["s4", '+s4+'] ]');
->>>>>>> parent of 02f45aa... Woojin changed
       },
       arrayItem: function(change, index, path) {
         // this.get(path, root) returns a value for a path

@@ -38,8 +38,11 @@
       carInfo{
         display: block;
       }
-      b{
+      .dead{
         color: red;
+      }
+      .alive{
+        color: green;
       }
       #atd_img{
         width : 400px;
@@ -88,10 +91,10 @@
         <div class="card-content">
           Facility Monitoring
           <template is="dom-if" if="{{monitor}}" restamp="true">
-            <b>Server alive!</b>
+            <b class="alive">Server Alive!</b>
           </template>
           <template is="dom-if" if="{{!monitor}}" restamp="true">
-            <b>Server Dead!</b>
+            <b class="dead">Server Dead!</b>
           </template>
         </div>
 

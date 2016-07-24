@@ -9,10 +9,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/google-chart/google-chart.html">
+<!-- <link rel="import" href="../bower_components/google-chart/google-chart.html"> -->
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 
 <script src="script/Chart.js"></script>
 <dom-module id="my-stats1">
@@ -58,6 +59,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color : #eee;
         width: 90%;
       }
+      .stat_lot{
+        width: 200px;
+      }
     </style>
 
     <iron-ajax
@@ -92,10 +96,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Hourly Parking Usage</h1>
       <p>Car Driver Parking Statistics in a Day</p>
       <div>
-        <label>Year</label>
+        <label>Date</label>
 
         <!-- <input is="iron-input" id="dayinput"> -->
-        <input id="date1" type="date">
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot1" value=""></paper-input>
+        <input id="date1" type="date" value="[[date]]">
         <paper-button id="name" on-tap="ajaxData1" raised>Update</paper-button>
 
          <!-- Chart js -->
@@ -117,17 +122,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div>
         <label>Month</label>
 
-
-        <input id="date2" type="month">
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot2" value=""></paper-input>
+        <input id="date2" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData2" raised>Update</paper-button>
 
         <!-- Chart js -->
        <canvas id="chart2"></canvas>
 
-        <!-- <google-chart id="chart2"
-          type="column"
-          options='{"title": "Monthly Parking Graph"}'>
-        </google-chart> -->
+
       </div>
     </div>
 
@@ -138,17 +140,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div>
         <label>Year</label>
 
-
-        <input id="date3" type="month">
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot3" value=""></paper-input>
+        <input id="date3" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData3" raised>Update</paper-button>
 
         <!-- Chart js -->
        <canvas id="chart3"></canvas>
 
-        <!-- <google-chart id="chart3"
-          type="column"
-          options='{"title": "Yearly Parking Graph"}'>
-        </google-chart> -->
       </div>
     </div>
 
@@ -162,7 +160,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-stats1',
       properties:{
         ip: String,
-        token : String
+        token : String,
+        facility_id : String,
+        date : String,
+        month : String
+
 
       },
       ready : function(){
@@ -173,14 +175,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       init_ajax: function(){
         var today = new Date();
-        var year = today.getYear();
-        var month = today.getMonth();
-        var day = today.getDay();
-        this.$.statsAjax1.params = {"facility_id" : '1', "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
+        var year = today.getFullYear();
+        var month = today.getMonth() + 1;
+        month = month.toString();
+        var day = today.getDate();
+        console.log("year : " + year);
+        console.log("month : " + month);
+        console.log("day : " + day);
+        if(month.length == 1){
+          month = "0" + month;
+        }
+        var date = year + "-" + month + "-" + day;
+        var mon = year + "-" + month
+        console.log(date);
+        this.date = date;
+        this.month = mon;
+
+        this.$.statsAjax1.params = {"facility_id" : 1, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
         this.$.statsAjax1.generateRequest();
-        this.$.statsAjax2.params = {"facility_id" : '1', "token":this.token,"year":year, "month":month, "type":"d"};
+        this.$.statsAjax2.params = {"facility_id" : 1, "token":this.token,"year":year, "month":month, "type":"d"};
         this.$.statsAjax2.generateRequest();
-        this.$.statsAjax3.params = {"facility_id" : '1', "token":this.token,"year":year, "type":"m"};
+        this.$.statsAjax3.params = {"facility_id" : 1, "token":this.token,"year":year, "type":"m"};
         this.$.statsAjax3.generateRequest();
       },
       ajaxData1 : function(){
@@ -190,8 +205,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         year = date[0];
         month = date[1];
         day = date[2];
+        var facility_id = this.$.stat_lot1.value;
+        // facility_id = parseInt(facility_id);
+        console.log("facility_id : " + facility_id);
         // console.log(year, month, day);
-        this.$.statsAjax1.params = {"facility_id" : '1', "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
+        this.$.statsAjax1.params = {"facility_id" : facility_id, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
         this.$.statsAjax1.generateRequest();
 
       },
@@ -203,7 +221,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         month = date[1];
         // day = date[2];
         // console.log(year, month, day);
-        this.$.statsAjax2.params = {"facility_id" : '1', "token":this.token,"year":year, "month":month, "type":"d"};
+        var facility_id = this.$.stat_lot2.value;
+        console.log("facility_id : " + facility_id);
+        this.$.statsAjax2.params = {"facility_id" : facility_id, "token":this.token,"year":year, "month":month, "type":"d"};
 
         this.$.statsAjax2.generateRequest();
 
@@ -215,8 +235,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         year = date[0];
         month = date[1];
         // day = date[2];
-        // console.log(year, month, day);
-        this.$.statsAjax3.params = {"facility_id" : '1', "token":this.token,"year":year, "type":"m"};
+        var facility_id = this.$.stat_lot3.value;
+        console.log("facility_id : " + facility_id);
+        this.$.statsAjax3.params = {"facility_id" : facility_id, "token":this.token,"year":year, "type":"m"};
 
         this.$.statsAjax3.generateRequest();
 
@@ -248,26 +269,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 13, scaleFontColor : "#ffa45e"});
 
 
-
-        // Google chart
-        //
-        // var response = this.$.statsAjax1.lastResponse;
-        // var length = response.length;
-        //
-        // var dataFrame = '[ ["Hour", "Usage"]';
-        // var cnt = 0;
-        // // console.log(response);
-        // response.forEach(function(entry){
-        //   dataFrame += ',["'+ cnt +'", '+entry.count+']';
-        //   cnt += 1;
-        // });
-        //
-        // dataFrame = dataFrame + ' ]';
-        // console.log(dataFrame);
-        //
-        // var map = this.$.chart1;
-        // map.setAttribute('type', 'column');
-        // map.setAttribute('data', dataFrame);
 
       },
       stat02_response: function(request){
@@ -340,24 +341,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var ctx = this.$.chart3.getContext("2d");
         var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 13, scaleFontColor : "#ffa45e"});
 
-        // google chart
-        // var response = this.$.statsAjax3.lastResponse;
-        // var length = response.length;
-        //
-        // var dataFrame = '[ ["Month", "Usage"]';
-        // var cnt = 0;
-        // var month = ['Jan', 'Feb', 'Mar', "Apr", "May", "Jun", "Jul", "Sep", "Oct", "Nov", "Dec"];
-        // response.forEach(function(entry){
-        //   dataFrame += ',["'+ month[cnt] +'", '+entry.count+']';
-        //   cnt += 1;
-        // });
-        //
-        // dataFrame = dataFrame + ' ]';
-        // console.log(dataFrame);
-        //
-        // var map = this.$.chart3;
-        // map.setAttribute('type', 'column');
-        // map.setAttribute('data', dataFrame);
+
 
       }
     });

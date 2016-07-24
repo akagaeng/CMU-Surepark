@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="my-icons.html">
 <script src="script/properties.js"></script>
 <dom-module id="my-app">
@@ -88,7 +89,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <!-- <a name="stats" href="">Statistic</a> -->
-          <a name="stats1" href="/stats1">Facility Usage</a>
+          <iron-icon icon="face"></iron-icon><a name="stats1" href="/stats1">Facility Usage</a>
           <a name="stats2" href="/stats2">Revenues</a>
           <a name="stats3" href="/stats3">Slot Usage</a>
           <a name="stats4" href="/stats4">Average Occupancy</a>
@@ -108,9 +109,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template is="dom-if" if="{{token}}">
               <paper-button id="logout" on-tap="logout" raised>Logout</paper-button>
             </template>
-
-
-
 
           </app-toolbar>
         </app-header>

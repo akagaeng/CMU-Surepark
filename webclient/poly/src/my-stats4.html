@@ -1,0 +1,134 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<!-- <script src="../bower_components/Chart.js/dist/Chart.js"></script> -->
+<!-- <script src="script/login.js"></script> -->
+<dom-module id="my-stats4">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .circle {
+        display: inline-block;
+        height: 64px;
+        width: 64px;
+        border-radius: 50%;
+        background: #ddd;
+        line-height: 64px;
+        font-size: 30px;
+        color: #555;
+        text-align: center;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 16px 0;
+        color: #212121;
+      }
+      google-chart {
+        width: 90%;
+      }
+      .chart {
+        width: 90%;
+      }
+    </style>
+
+    <iron-ajax auto
+        url="{{ip}}/api/admin/stats/occupancy"
+        params='{"year":"2015", "month":"3", "day":"12"}'
+        handle-as="json"
+        last-response="{{ajaxResponse}}">
+    </iron-ajax>
+
+    {{ajaxResponse}}
+
+    <div class="card">
+      <div class="circle">1</div>
+      <h1>Daily Parking Average Occupancy</h1>
+      <p>Average Occupancy in a Day</p>
+      <div>
+        <google-chart class="chart"
+          type='pie'
+          options='{"title": "Distribution of days in 2001Q1"}'
+          cols='[{"label":"Month", "type":"string"}, {"label":"Days", "type":"number"}]'
+          rows='[["Jan", 31],["Feb", 28],["Mar", 31]]'>
+        </google-chart>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="circle">2</div>
+      <h1>Monthly Parking  Average Occupancy</h1>
+      <p> Average Occupancy in a Month</p>
+      <div>
+        <google-chart class="chart"
+          type='bar'
+          options='{"title": "Distribution of days in 2001Q1"}'
+          cols='[{"label":"Month", "type":"string"}, {"label":"Days", "type":"number"}]'
+          rows='[["Jan", 31],["Feb", 28],["Mar", 31]]'>
+        </google-chart>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="circle">2</div>
+      <h1>Monthly Parking  Average Occupancy</h1>
+      <p> Average Occupancy in a Month</p>
+      <div>
+        <google-chart class="chart"
+          type='bar'
+          options='{"title": "Distribution of days in 2001Q1"}'
+          cols='[{"label":"Month", "type":"string"}, {"label":"Days", "type":"number"}]'
+          rows='[["Jan", 31],["Feb", 28],["Mar", 31]]'>
+        </google-chart>
+      </div>
+    </div>
+
+  </template>
+
+
+  <script>
+
+    Polymer({
+
+      is: 'my-stats4',
+      properties:{
+        ip: String,
+        token : String
+      },
+      ready : function(){
+        console.log(this.ip);
+        var token = localStorage.getItem("token");
+        this.token = token;
+        if (!token){
+          console.log("token is not existed");
+          this.page = "login";
+        }
+
+      },
+    });
+
+  </script>
+
+</dom-module>

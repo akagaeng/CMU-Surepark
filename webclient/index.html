@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<title>Surepark Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+
+
+<body class="w3-container">
+  <script src="bower_components/vue/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/0.9.1/vue-resource.js"></script>
+  <script   src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
+  <div class="w3-containter w3-teal w3-center">
+
+    <h2>Surepark Admin Page</h2>
+    <h3>Please Login First!</h3>
+  </div>
+
+  <div class="w3-center">
+
+    <img src="parking.jpg" style="width:30%" class="w3-border w3-margin-top">
+  </div>
+  <div class="w3-col w3-container l3"></div>
+  <form id="app" class="w3-col w3-container l6" action="" @submit.prevent="userCheck">
+    <div class="w3-section">
+      <label><b>Username</b></label>
+      <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Admin ID" name="user" v-model="user_id" required>
+
+      <label><b>Password</b></label>
+      <input class="w3-input w3-border" type="password" placeholder="Password" name="pass" v-model="user_pw" required>
+
+      <button class="w3-btn-block w3-green w3-section w3-padding" type="submit">Login</button>
+    </div>
+  </form>
+  <div class="w3-col w3-container l3"></div>
+
+  <script>
+  var apiUrl = 'https://api.github.com/repositories/11730342/commits?per_page=3&sha=master';
+  new Vue({
+
+    el:"#app",
+    data : {
+      message : "Hello Vue",
+      user_id : "",
+      user_pw : ""
+
+    },
+    methods: {
+      userCheck: function(){
+          // this.$http.jsonp('http:localhost:4567/hello', {credentials:'true'}).then(function(data){
+          //   alert(data);
+          // }, function(){
+          //   alert("error");
+          // // });
+          // $.getJSON('http://localhost:4567/api/login/admin', function(data){
+          //
+          //   var user = data.user_id;
+          //
+          //   if (user === 'admin'){
+          //       window.location = "admin.html";
+          //   }else{
+          //       window.location = "attend.html";
+          //   }
+          //
+          // }.bind(this));
+
+          $.ajax({
+            method: "POST",
+            url: "http://localhost:4567/api/login/admin",
+            data: { user_id: this.user_id, user_pw: this.user_pw}
+          }).done(function(data){
+            var user = data.user_id;
+            console.log(user);
+            if (user === 'admin'){
+                window.location = "admin.html";
+            }else{
+                window.location = "attend.html";
+            }
+          });
+
+      }
+    }
+
+  });
+  </script>
+
+
+</body>
+</html>

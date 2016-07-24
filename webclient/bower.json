@@ -1,0 +1,24 @@
+{
+  "name": "webclient",
+  "homepage": "https://github.com/akagaeng/surepark",
+  "authors": [
+    "woojin <verecahill@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "vue": "~1.0.26",
+    "page": "visionmedia/page.js#~1.7.1",
+    "vue-router": "~0.7.13",
+    "paper-button": "PolymerElements/paper-button#~1.0.12"
+  }
+}

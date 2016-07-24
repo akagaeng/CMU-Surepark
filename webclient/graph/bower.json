@@ -1,0 +1,21 @@
+{
+  "name": "graph",
+  "homepage": "https://github.com/akagaeng/surepark",
+  "authors": [
+    "woojin <verecahill@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Chart.js": "chartjs#~2.1.6"
+  }
+}

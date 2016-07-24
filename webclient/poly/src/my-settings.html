@@ -1,0 +1,152 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<!-- <script src="script/login.js"></script> -->
+<dom-module id="my-settings">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .circle {
+        display: inline-block;
+        height: 64px;
+        width: 64px;
+        border-radius: 50%;
+        background: #ddd;
+        line-height: 64px;
+        font-size: 30px;
+        color: #555;
+        text-align: center;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 16px 0;
+        color: #212121;
+      }
+    </style>
+
+    <iron-ajax auto
+        id="chargeAjax"
+        url="{{ip}}/api/admin/setting/charge"
+        handle-as="json"
+        on-response="charge_response"
+        last-response="{{priceAjax}}">
+    </iron-ajax>
+
+    <iron-ajax auto
+        id="periodAjax"
+        url="{{ip}}/api/admin/setting/period"
+        handle-as="json"
+        on-response="period_response"
+        last-response="{{grace}}">
+    </iron-ajax>
+
+    <div class="card">
+      <div class="circle">1</div>
+      <h1>Grace Period</h1>
+      <p>Maximum waiting time until the drive arrives in the parking lot</p>
+      <form is="iron-form" method="get" action="{{ip}}/api/admin/setting/period">
+        <!-- <paper-input id="grace" name="grace" label="Grace Period" value="{{grace.time}}" auto-validate allowed-pattern="[0-9]*" error-message="number only!" required></paper-input> -->
+        <paper-input id="grace" name="grace" label="Grace Period" value="{{grace.time}}" auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-button raised on-tap="graceSubmit">Submit</paper-button>
+        <div class="output"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="circle">2</div>
+      <h1>Parking fee</h1>
+      <p>Morning, Afternoon, Weekend</p>
+      <form is="iron-form" method="get" action="/" id="presubmit">
+
+        <paper-input id="morning" label="Morning price" value="{{priceAjax.morning}}" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-input id="afternoon" label="Afternoon price" value="{{priceAjax.afternoon}}" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <!-- <paper-input id="weekend" label="Weekend price" value="{{priceAjax.weekend}}" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input> -->
+        <paper-button raised on-tap="priceSubmit">Submit</paper-button>
+
+        <div class="output"></div>
+      </form>
+    </div>
+
+    <paper-dialog id="dialog_1">
+      <h2>Change Success!</h2>
+
+      <div class="buttons">
+        <paper-button dialog-confirm>Accept</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="dialog_0">
+      <h2>Change Failed!</h2>
+
+      <div class="buttons">
+        <paper-button dialog-confirm>Accept</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'my-settings',
+      properties:{
+        ip: String,
+        token : String
+
+      },
+      ready : function(){
+        console.log(this.ip);
+        var token = sessionStorage.getItem("token");
+        this.token = token;
+      },
+      charge_response: function(){
+        // var result = this.$.chargeAjax.lastResponse;
+        // if(result === 'true'){
+        //   this.$.dialog_1.open();
+        // }
+        // this.$.dialog_0.open();
+      },
+      period_response: function(){
+        // var result = this.$.periodAjax.lastResponse;
+        // if(result === 'true'){
+        //   this.$.dialog_1.open();
+        // }
+        // this.$.dialog_0.open();
+      },
+      graceSubmit: function(){
+        var grace = this.$.grace.value;
+        this.$.periodAjax.params = {"grace":grace};
+        this.$.periodAjax.generateRequest();
+
+      },
+      priceSubmit: function(){
+        var morning = this.$.morning.value;
+        var afternoon = this.$.afternoon.value;
+        var weekend = this.$.weekend.value;
+        this.$.chargeAjax.params = {"morning":morning, "afternoon":afternoon};
+        this.$.chargeAjax.generateRequest();
+
+      }
+
+    });
+
+
+  </script>
+
+</dom-module>

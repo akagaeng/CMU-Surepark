@@ -1,0 +1,209 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="my-icons.html">
+<script src="script/properties.js"></script>
+<dom-module id="my-app">
+
+  <template id="main-app">
+
+    <style>
+
+      :host {
+        display: block;
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+      }
+
+      app-header {
+        background-color: var(--app-primary-color);
+        color: #fff;
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        line-height: 40px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+      }
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+      .drawer-list a.subroute {
+        padding-left: 32px;
+      }
+       div#contentContainer {
+         width : 100px;
+       }
+       #logout{
+         width : 50px;
+         height : 20px;
+         background-color: white;
+         color: black;
+         font-size: 10pt;
+         margin-left: 20px;
+       }
+
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <app-drawer-layout fullbleed>
+
+      <!-- Drawer content -->
+      <!-- <app-drawer app-drawer-width="300px"> -->
+      <app-drawer>
+        <app-toolbar>Menu</app-toolbar>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <!-- <a name="stats" href="">Statistic</a> -->
+          <a name="stats1" href="/stats1">Facility Usage</a>
+          <a name="stats2" href="/stats2">Revenues</a>
+          <a name="stats3" href="/stats3">Slot Usage</a>
+          <a name="stats4" href="/stats4">Average Occupancy</a>
+          <a name="settings" href="/settings">Settings</a>
+          <!-- <a name="login" href="/login">Login</a> -->
+
+        </iron-selector>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+
+        <app-header condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+            <div title>Dashboard</div>
+            <template is="dom-if" if="{{token}}">
+              <paper-button id="logout" on-tap="logout" raised>Logout</paper-button>
+            </template>
+
+
+
+
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages id="pages" role="main" selected="[[page]]" attr-for-selected="name">
+          <my-stats1 ip={{ip}} name="stats1"></my-stats1>
+          <my-stats2 ip={{ip}} name="stats2"></my-stats2>
+          <my-stats3 ip={{ip}} name="stats3"></my-stats3>
+          <my-stats4 ip={{ip}} name="stats4"></my-stats4>
+          <my-settings ip={{ip}} name="settings"></my-settings>
+          <my-login ip={{ip}} name="login"></my-login>
+        </iron-pages>
+
+      </app-header-layout>
+
+    </app-drawer-layout>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'my-app',
+
+      properties: {
+
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        },
+        token : String,
+        ip : String
+
+
+      },
+      ready : function(){
+          // console.log("ready");
+          // var token = sessionStorage.getItem("token");
+          //
+          // // console.log(token);
+          // this.token = token;
+          var ip = properties.ip;
+          console.log(ip);
+          this.ip = ip;
+          // if (!token){
+          //   console.log("token is not existed");
+          //   var pages = document.querySelector("main-app");
+          //   pages.selected = 0;
+          // }
+
+      },
+      logout : function(){
+          sessionStorage.clear();
+          location.reload();
+      },
+      observers: [
+        '_routePageChanged(routeData.page)'
+      ],
+
+      _routePageChanged: function(page) {
+        var token = sessionStorage.getItem("token");
+        this.token = token;
+        console.log("routePageChanged");
+        console.log(page);
+        if(this.token){
+            console.log('token');
+            this.page = page || 'stats1';
+        }else{
+            console.log('no token');
+            this.page = 'login';
+        }
+      },
+
+      _pageChanged: function(page) {
+        // load page import on demand.
+        console.log("page changed");
+        // console.log(this.token);
+        // if(!this.token){
+        //   console.log("no token");
+        //   var login = 'login';
+        //   this.importHref(this.resolveUrl('my-' + login + '.html'), null, null, true);
+        // }else{
+        //   console.log("hello token");
+        //   this.importHref(this.resolveUrl('my-' + page + '.html'), null, null, true);
+        // }
+        this.importHref(this.resolveUrl('my-' + page + '.html'), null, null, true);
+
+      }
+
+    });
+
+  </script>
+
+</dom-module>

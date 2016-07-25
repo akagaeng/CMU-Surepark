@@ -66,8 +66,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax
         id = "statsAjax1"
-        url="{{ip}}/api/admin/stats/peaktime"
-        params='{"facility_id": 1, "year":"2015", "month":"12", "day":"13", "type":"h" }'
+        url="{{ip}}/api/admin/stats/occupancy"
+
         handle-as="json"
         on-response="stat01_response"
         last-response="{{stats01}}">
@@ -75,8 +75,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax
         id = "statsAjax2"
-        url="{{ip}}/api/admin/stats/peaktime"
-        params='{"facility_id": 1, "year":"2015", "month":"12", "day":"13", "type":"d"}'
+        url="{{ip}}/api/admin/stats/occupancy"
+
         handle-as="json"
         on-response="stat02_response"
         last-response="{{stats02}}">
@@ -84,8 +84,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax
         id = "statsAjax3"
-        url="{{ip}}/api/admin/stats/peaktime"
-        params='{"facility_id": 1, "year":"2015", "month":"12", "day":"13", "type":"m"}'
+        url="{{ip}}/api/admin/stats/occupancy"
+
         handle-as="json"
         on-response="stat03_response"
         last-response="{{stats03}}">
@@ -96,21 +96,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Hourly Average Occupancy</h1>
       <p>Car Driver Average Parking Statistics in a Day</p>
       <div>
-        <label>Date</label>
 
-        <!-- <input is="iron-input" id="dayinput"> -->
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot1" value=""></paper-input>
-        <input id="date1" type="date">
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot1" value="[[facility_id]]"></paper-input>
+        <input id="date1" type="date" value="[[date]]">
         <paper-button id="name" on-tap="ajaxData1" raised>Update</paper-button>
-
-         <!-- Chart js -->
         <canvas id="chart1"></canvas>
-
-        <!-- <google-chart id="chart1"
-          type="column"
-          options='{"title": "Daily Parking Graph"}'>
-        </google-chart> -->
-
 
       </div>
     </div>
@@ -120,15 +110,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Daily Average Occupancy</h1>
       <p>Car Driver Average Parking Statistics in a Month</p>
       <div>
-        <label>Month</label>
 
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot2" value=""></paper-input>
-        <input id="date2" type="month">
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot2" value="[[facility_id]]"></paper-input>
+        <input id="date2" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData2" raised>Update</paper-button>
 
         <!-- Chart js -->
        <canvas id="chart2"></canvas>
-
 
       </div>
     </div>
@@ -138,10 +126,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Monthly Average Occupancy</h1>
       <p>Car Driver Average Parking Statistics in a Year</p>
       <div>
-        <label>Year</label>
-
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot3" value=""></paper-input>
-        <input id="date3" type="month">
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot3" value="[[facility_id]]"></paper-input>
+        <input id="date3" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData3" raised>Update</paper-button>
 
         <!-- Chart js -->
@@ -149,7 +135,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       </div>
     </div>
-
 
   </template>
 
@@ -161,29 +146,43 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       properties:{
         ip: String,
         token : String,
-        facility_id : String
+        facility_id : {
+          type : String,
+          value : '1'
+        }
 
       },
       ready : function(){
         this.hello2 = "hello tests";
         console.log(this.ip);
+        this.token = sessionStorage.getItem('token');
         this.init_ajax();
+
 
       },
       init_ajax: function(){
         var today = new Date();
         var year = today.getFullYear();
         var month = today.getMonth() + 1;
+        month = month.toString();
         var day = today.getDate();
         console.log("year : " + year);
-        console.log("year : " + month);
-        console.log("year : " + day);
+        console.log("month : " + month);
+        console.log("day : " + day);
+        if(month.length == 1){
+          month = "0" + month;
+        }
+        var date = year + "-" + month + "-" + day;
+        var mon = year + "-" + month
+        console.log(date);
+        this.date = date;
+        this.month = mon;
 
-        this.$.statsAjax1.params = {"facility_id" : 1, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
+        this.$.statsAjax1.params = {"facility_id" : this.facility_id, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
         this.$.statsAjax1.generateRequest();
-        this.$.statsAjax2.params = {"facility_id" : 1, "token":this.token,"year":year, "month":month, "type":"d"};
+        this.$.statsAjax2.params = {"facility_id" : this.facility_id, "token":this.token,"year":year, "month":month, "type":"d"};
         this.$.statsAjax2.generateRequest();
-        this.$.statsAjax3.params = {"facility_id" : 1, "token":this.token,"year":year, "type":"m"};
+        this.$.statsAjax3.params = {"facility_id" : this.facility_id, "token":this.token,"year":year, "type":"m"};
         this.$.statsAjax3.generateRequest();
       },
       ajaxData1 : function(){

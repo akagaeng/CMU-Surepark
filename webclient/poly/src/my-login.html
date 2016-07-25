@@ -72,6 +72,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 24px;
         margin-bottom: 0px;
         width: 50%;
+      }#loginRst{
+        color:red;
       }
     </style>
 
@@ -80,7 +82,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax
         id="loginAjax"
         url="{{ip}}/api/admin/login"
-        params='{"userId":"{{userId}}", "password":"polymer"}'
         handle-as="json"
         method="post"
         on-response="loginResponse"
@@ -93,6 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       <paper-input id="userId" label="User ID"></paper-input>
       <paper-input id="password" label="Password" type="password"></paper-input>
+      <span id="loginRst">[[loginRst]]</span>
       <br>
       <paper-button raised on-tap="doLogin">Login</paper-button>
     </div>
@@ -105,7 +107,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </paper-card>
 
-
   </template>
 
 
@@ -116,8 +117,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-login',
       properties:{
         ip: String,
-        token : String
-
+        token : String,
+        loginRst : String
       },
       ready : function(){
         console.log(this.ip);
@@ -134,9 +135,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       loginResponse: function(){
         var token = this.$.loginAjax.lastResponse;
 
-        sessionStorage.setItem("token", token);
-        window.location = "http://localhost:8080/stats1";
-        // location = "http://localhost:8080/stats2";
+        if(token === 'fail'){
+          // this.$.loginRst = "Login Failed, please check your account!";
+          this.loginRst = "Login Failed, please check your account!";
+        }else{
+          sessionStorage.setItem("token", token);
+
+        }
+        location.reload();
       }
 
     });

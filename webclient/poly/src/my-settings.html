@@ -16,7 +16,7 @@
       .card {
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
         padding: 16px;
-        margin: 24px;
+        margin: 15px 24px;
         border-radius: 5px;
         background-color: #fff;
         color: #757575;
@@ -37,44 +37,61 @@
         margin: 16px 0;
         color: #212121;
       }
+      #facility_id{
+        width: 300px;
+      }
     </style>
 
-    <iron-ajax auto
+    <iron-ajax
+        id="requsetInfo"
+        url="{{ip}}/api/admin/setting/facility"
+        handle-as="json"
+        last-response="{{requsetInfo}}">
+    </iron-ajax>
+
+    <iron-ajax
         id="chargeAjax"
         url="{{ip}}/api/admin/setting/charge"
         handle-as="json"
+        method="post"
         on-response="charge_response"
         last-response="{{priceAjax}}">
     </iron-ajax>
 
-    <iron-ajax auto
+    <iron-ajax
         id="periodAjax"
         url="{{ip}}/api/admin/setting/period"
         handle-as="json"
+        method="post"
         on-response="period_response"
         last-response="{{grace}}">
     </iron-ajax>
 
     <div class="card">
-      <div class="circle">1</div>
+      <!-- <h1>Facility ID</h1> -->
+        <paper-input id="facility_id" label="Facility ID" value="{{facility_id}}" auto-validate allowed-pattern="[0-9]" error-message="Number only!" required></paper-input>
+    </div>
+
+    <div class="card">
+      <!-- <div class="circle">1</div> -->
       <h1>Grace Period</h1>
       <p>Maximum waiting time until the drive arrives in the parking lot</p>
       <form is="iron-form" method="get" action="{{ip}}/api/admin/setting/period">
         <!-- <paper-input id="grace" name="grace" label="Grace Period" value="{{grace.time}}" auto-validate allowed-pattern="[0-9]*" error-message="number only!" required></paper-input> -->
-        <paper-input id="grace" name="grace" label="Grace Period" value="{{grace.time}}" auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-input id="grace" name="grace" label="Grace Period" value="[[requsetInfo.parkingfacility_graceperiod]]" auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
         <paper-button raised on-tap="graceSubmit">Submit</paper-button>
         <div class="output"></div>
       </form>
     </div>
 
     <div class="card">
-      <div class="circle">2</div>
+      <!-- <div class="circle">2</div> -->
       <h1>Parking fee</h1>
-      <p>Morning, Afternoon, Weekend</p>
-      <form is="iron-form" method="get" action="/" id="presubmit">
+      <p>Morning / Afternoon </p>
+      <form is="iron-form" method="post" action="/" id="presubmit">
 
-        <paper-input id="morning" label="Morning price" value="{{priceAjax.morning}}" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
-        <paper-input id="afternoon" label="Afternoon price" value="{{priceAjax.afternoon}}" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-input id="morning" label="Morning Price" value="[[requsetInfo.parkingfacility_am_price]]" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-input id="afternoon" label="Afternoon Price" value="[[requsetInfo.parkingfacility_pm_price]]" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
         <!-- <paper-input id="weekend" label="Weekend price" value="{{priceAjax.weekend}}" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input> -->
         <paper-button raised on-tap="priceSubmit">Submit</paper-button>
 
@@ -107,39 +124,58 @@
       is: 'my-settings',
       properties:{
         ip: String,
-        token : String
+        token : String,
+        facility_id: {
+          type :String,
+          value : '1'
+        }
 
       },
       ready : function(){
         console.log(this.ip);
         var token = sessionStorage.getItem("token");
         this.token = token;
+        // this.facility_id = 1;
+        this.init_ajax();
+      },
+      init_ajax: function(){
+        this.$.requsetInfo.params = {"token":this.token,"facility_id": this.facility_id};
+        this.$.requsetInfo.generateRequest();
+        // this.$.periodAjax.params = {"token":this.token, "facility_id": this.facility_id};
+        // this.$.periodAjax.generateRequest();
       },
       charge_response: function(){
-        // var result = this.$.chargeAjax.lastResponse;
-        // if(result === 'true'){
-        //   this.$.dialog_1.open();
-        // }
-        // this.$.dialog_0.open();
+        var result = this.$.chargeAjax.lastResponse;
+        this.$.morning.value = result.parkingfacility_am_price;
+        this.$.afternoon.value = result.parkingfacility_pm_price;
+        if(result.parkingfacility_am_price){
+          this.$.dialog_1.open();
+        }else{
+          this.$.dialog_0.open();
+        }
       },
       period_response: function(){
-        // var result = this.$.periodAjax.lastResponse;
-        // if(result === 'true'){
-        //   this.$.dialog_1.open();
-        // }
-        // this.$.dialog_0.open();
+        var result = this.$.periodAjax.lastResponse;
+        this.$.grace.value = result.parkingfacility_graceperiod;
+        if(result.parkingfacility_graceperiod){
+          this.$.dialog_1.open();
+        }else{
+          this.$.dialog_0.open();
+        }
+
       },
       graceSubmit: function(){
         var grace = this.$.grace.value;
-        this.$.periodAjax.params = {"grace":grace};
+        this.$.periodAjax.params = {"token": this.token, "facility_id": this.facility_id, "grace":grace};
+        // this.$.periodAjax.method = "post";
         this.$.periodAjax.generateRequest();
 
       },
       priceSubmit: function(){
         var morning = this.$.morning.value;
         var afternoon = this.$.afternoon.value;
-        var weekend = this.$.weekend.value;
-        this.$.chargeAjax.params = {"morning":morning, "afternoon":afternoon};
+        this.$.chargeAjax.params = {"token": this.token, "facility_id": this.facility_id, "morning":morning, "afternoon":afternoon};
+        // this.$.periodAjax.method = "post";
         this.$.chargeAjax.generateRequest();
 
       }

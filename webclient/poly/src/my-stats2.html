@@ -63,7 +63,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 200px;
       }
     </style>
-
+<!--
     <iron-ajax
         id = "statsAjax1"
         url="{{ip}}/api/admin/stats/revenue"
@@ -71,7 +71,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         handle-as="json"
         on-response="stat01_response"
         last-response="{{stats01}}">
-    </iron-ajax>
+    </iron-ajax> -->
 
     <iron-ajax
         id = "statsAjax2"
@@ -90,57 +90,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         on-response="stat03_response"
         last-response="{{stats03}}">
     </iron-ajax>
-
+<!--
     <div class="card">
       <div class="circle">1</div>
       <h1>Hourly Parking Revenue</h1>
       <p>Parking Revenue in a Day</p>
       <div>
         <label>Date</label>
-
-        <!-- <input is="iron-input" id="dayinput"> -->
         <paper-input class="stat_lot" label="Facility ID" id="stat_lot1" value=""></paper-input>
-        <input id="date1" type="date">
+        <input id="date1" type="date" value="[[date]]">
         <paper-button id="name" on-tap="ajaxData1" raised>Update</paper-button>
 
-        <!-- Chart js -->
        <canvas id="chart1"></canvas>
+      </div>
+    </div>
+ -->
+    <div class="card">
+      <div class="circle">1</div>
+      <h1>Daily Parking Revenue</h1>
+      <p>Parking Revenue in a Month</p>
+      <div>
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot2" value="[[facility_id]]"></paper-input>
+        <input id="date2" type="month" value="[[month]]">
+        <paper-button id="name" on-tap="ajaxData2" raised>Update</paper-button>
 
-
+       <canvas id="chart2"></canvas>
 
       </div>
     </div>
 
     <div class="card">
       <div class="circle">2</div>
-      <h1>Daily Parking Revenue</h1>
-      <p>Parking Revenue in a Month</p>
-      <div>
-        <label>Month</label>
-
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot2" value=""></paper-input>
-        <input id="date2" type="month">
-        <paper-button id="name" on-tap="ajaxData2" raised>Update</paper-button>
-
-        <!-- Chart js -->
-       <canvas id="chart2"></canvas>
-
-
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="circle">3</div>
       <h1>Monthly Parking Revenue</h1>
       <p>Car Driver Parking Statistics in a year</p>
       <div>
-        <label>Year</label>
 
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot3" value=""></paper-input>
-        <input id="date3" type="month">
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot3" value="[[facility_id]]"></paper-input>
+        <input id="date3" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData3" raised>Update</paper-button>
 
-        <!-- Chart js -->
        <canvas id="chart3"></canvas>
 
 
@@ -157,7 +145,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-stats2',
       properties:{
         ip: String,
-        token : String
+        token : String,
+        facility_id : {
+          type : String,
+          value : '1'
+        }
       },
       ready : function(){
         console.log(this.ip);
@@ -188,28 +180,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.date = date;
         this.month = mon;
 
-        this.$.statsAjax1.params = {"facility_id" : '1', "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
-        this.$.statsAjax1.generateRequest();
-        this.$.statsAjax2.params = {"facility_id" : '1', "token":this.token,"year":year, "month":month, "type":"d"};
+        // this.$.statsAjax1.params = {"facility_id" : '1', "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
+        // this.$.statsAjax1.generateRequest();
+        this.$.statsAjax2.params = {"facility_id" : this.facility_id, "token":this.token,"year":year, "month":month, "type":"d"};
         this.$.statsAjax2.generateRequest();
-        this.$.statsAjax3.params = {"facility_id" : '1', "token":this.token,"year":year, "type":"m"};
+        this.$.statsAjax3.params = {"facility_id" : this.facility_id, "token":this.token,"year":year, "type":"m"};
         this.$.statsAjax3.generateRequest();
       },
-      ajaxData1 : function(){
-        var date = this.$.date1.value;
-        console.log(date);
-        date = date.split("-");
-        year = date[0];
-        month = date[1];
-        day = date[2];
-        // console.log(year, month, day);
-        var facility_id = this.$.stat_lot1.value;
-        console.log("facility_id : " + facility_id);
-        this.$.statsAjax1.params = {"facility_id": facility_id, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
-
-        this.$.statsAjax1.generateRequest();
-
-      },
+      // ajaxData1 : function(){
+      //   var date = this.$.date1.value;
+      //   console.log(date);
+      //   date = date.split("-");
+      //   year = date[0];
+      //   month = date[1];
+      //   day = date[2];
+      //   // console.log(year, month, day);
+      //   var facility_id = this.$.stat_lot1.value;
+      //   console.log("facility_id : " + facility_id);
+      //   this.$.statsAjax1.params = {"facility_id": facility_id, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
+      //
+      //   this.$.statsAjax1.generateRequest();
+      //
+      // },
       ajaxData2 : function(){
         var date = this.$.date2.value;
         console.log(date);
@@ -220,7 +212,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // console.log(year, month, day);
         var facility_id = this.$.stat_lot2.value;
         console.log("facility_id : " + facility_id);
-        this.$.statsAjax2.params = {"token":this.token,"year":year, "month":month, "type":"d"};
+        this.$.statsAjax2.params = {"facility_id": facility_id,"token":this.token,"year":year, "month":month, "type":"d"};
 
         this.$.statsAjax2.generateRequest();
 
@@ -240,33 +232,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.statsAjax3.generateRequest();
 
       },
-      stat01_response: function(request){
-        // Chartjs
-        var response = this.$.statsAjax1.lastResponse;
-        var length = response.length;
-
-        var labels = [];
-        var data = []
-        response.forEach(function(entry){
-          labels.push(entry.slot);
-          data.push(entry.count);
-        });
-
-        var BarChart = {
-            labels: labels,
-            datasets: [
-            {
-              fillColor: "rgba(252,147,65,0.5)",
-              strokeColor: "rgba(255,255,255,1)",
-              data: data
-            }
-          ]
-        }
-        var ctx = this.$.chart1.getContext("2d");
-        var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 13, scaleFontColor : "#ffa45e"});
-
-
-      },
+      // stat01_response: function(request){
+      //   // Chartjs
+      //   var response = this.$.statsAjax1.lastResponse;
+      //   var length = response.length;
+      //
+      //   var labels = [];
+      //   var data = []
+      //   response.forEach(function(entry){
+      //     labels.push(entry.slot);
+      //     data.push(entry.count);
+      //   });
+      //
+      //   var BarChart = {
+      //       labels: labels,
+      //       datasets: [
+      //       {
+      //         fillColor: "rgba(252,147,65,0.5)",
+      //         strokeColor: "rgba(255,255,255,1)",
+      //         data: data
+      //       }
+      //     ]
+      //   }
+      //   var ctx = this.$.chart1.getContext("2d");
+      //   var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 13, scaleFontColor : "#ffa45e"});
+      //
+      //
+      // },
       stat02_response: function(request){
 
         // Chartjs

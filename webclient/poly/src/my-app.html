@@ -21,6 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="my-icons.html">
 <script src="script/properties.js"></script>
 <dom-module id="my-app">
@@ -126,6 +127,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </app-drawer-layout>
 
+    <iron-ajax
+        id="logoutAjax"
+        url="{{ip}}/api/admin/logout"
+        handle-as="json"
+        method="get"
+        on-response="logoutResponse"
+        last-response="{{logoutRst}}">
+    </iron-ajax>
+
   </template>
 
   <script>
@@ -155,6 +165,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var ip = properties.ip;
           console.log(ip);
           this.ip = ip;
+          this.token = sessionStorage.getItem("token");
           // if (!token){
           //   console.log("token is not existed");
           //   var pages = document.querySelector("main-app");
@@ -163,8 +174,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       },
       logout : function(){
-          sessionStorage.clear();
+
+          this.$.logoutAjax.params = {"token":this.token};
+          this.$.logoutAjax.generateRequest();
+
+
+      },
+      logoutResponse: function(){
+          var result = this.$.logoutAjax.lastResponse;
+          if(result === "success"){
+              sessionStorage.clear();
+          }
           location.reload();
+
       },
       observers: [
         '_routePageChanged(routeData.page)'

@@ -63,7 +63,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
-    <iron-ajax auto
+    <iron-ajax
         id = "statsAjax1"
         url="{{ip}}/api/admin/stats/slot"
         params='{"year":"2015", "month":"12", "day":"13", "type":"d"}'
@@ -72,7 +72,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         last-response="{{stats01}}">
     </iron-ajax>
 
-    <iron-ajax auto
+    <iron-ajax
         id = "statsAjax2"
         url="{{ip}}/api/admin/stats/slot"
         params='{"year":"2015", "month":"12", "day":"13", "type":"m"}'
@@ -88,19 +88,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <p>Car Driver Parking Statistics in a Day</p>
 
       <div>
-        <label>Date</label>
 
-        <!-- <input is="iron-input" id="dayinput"> -->
-        <input id="date1" type="date">
+        <input id="date1" type="date" value="[[date]]">
         <paper-button id="name" on-tap="ajaxData1" raised>Update</paper-button>
 
         <!-- chartjs  -->
         <canvas id="chart1"></canvas>
-
-        <!-- <google-chart id="chart1"
-          type="column"
-          options='{"title": "Daily Parking Graph","hAxis":{"title": "Count"},"vAxis":{"title": "Hour", "minValue": 10}}'>
-        </google-chart> -->
 
       </div>
     </div>
@@ -113,16 +106,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <label>Month</label>
 
 
-        <input id="date2" type="month">
+        <input id="date2" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData2" raised>Update</paper-button>
 
         <!-- chartjs -->
         <canvas id="chart2"></canvas>
-
-        <!-- <google-chart id="chart2"
-          type="column"
-          options='{"title": "Monthly Parking Graph"}'>
-        </google-chart> -->
 
       </div>
     </div>
@@ -137,7 +125,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-stats3',
       properties:{
         ip: String,
-        token : String
+        token : String,
       },
       ready : function(){
         console.log(this.ip);
@@ -147,7 +135,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           console.log("token is not existed");
           this.page = "login";
         }
+        this.init_ajax();
 
+      },
+      init_ajax: function(){
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = today.getMonth() + 1;
+        month = month.toString();
+        var day = today.getDate();
+        console.log("year : " + year);
+        console.log("month : " + month);
+        console.log("day : " + day);
+        if(month.length == 1){
+          month = "0" + month;
+        }
+        var date = year + "-" + month + "-" + day;
+        var mon = year + "-" + month;
+        console.log(date);
+        this.date = date;
+        this.month = mon;
+
+        this.$.statsAjax1.params = {"token":this.token,"year":year, "month":month, "day":day, "type":"d"};
+        this.$.statsAjax1.generateRequest();
+        this.$.statsAjax2.params = {"token":this.token,"year":year, "month":month, "day":day, "type":"m"};
+        this.$.statsAjax2.generateRequest();
       },
       ajaxData1 : function(){
         var date = this.$.date1.value;
@@ -183,7 +195,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var labels = [];
         var data = []
         response.forEach(function(entry){
-          labels.push(entry.slot.parkingslot_id);
+          labels.push("Slot " + entry.slot.parkingslot_id);
           data.push(entry.count);
         });
 
@@ -192,36 +204,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             datasets: [
             {
               label: "hello",
-              fillColor: "rgba(86,138,196,0.5)",
+              // fillColor: "rgba(86,138,196,0.5)",
+              fillColor: 'rgba(54, 162, 235, 0.2)',
               strokeColor: "rgba(255,255,255,1)",
               borderWidth:1,
-              data: data
+              barWidth: 0.4,
+              data: data,
+              isFixedWidth: false,
+              barWidth: 30
             }
           ]
         }
         var ctx = this.$.chart1.getContext("2d");
         var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 15, scaleFontColor : "#783329"});
 
-        // google chart
-        // var response = this.$.statsAjax1.lastResponse;
-        //
-        // var length = response.length;
-        // console.log(length);
-        //
-        // var dataFrame = '[ ["Day", "Usage"]';
-        // var cnt = 0;
-        // response.forEach(function(entry){
-        //   // var h = i+1;
-        //   cnt += 1;
-        //   dataFrame += ',["'+ entry.slot.parkingslot_id +'", '+entry.count+']';
-        // });
-        //
-        // dataFrame = dataFrame + ' ]';
-        // console.log(dataFrame);
-        //
-        // var map = this.$.chart1;
-        // map.setAttribute('type', 'column');
-        // map.setAttribute('data', dataFrame);
+
 
 
       },
@@ -234,7 +231,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var labels = [];
         var data = []
         response.forEach(function(entry){
-          labels.push(entry.slot.parkingslot_id);
+          labels.push("Slot " + entry.slot.parkingslot_id);
           data.push(entry.count);
         });
 
@@ -252,29 +249,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 15, scaleFontColor : "#ffa45e"});
 
 
-        // google chart
-        // var response = this.$.statsAjax2.lastResponse;
-        // var length = response.length;
-        //
-        // var dataFrame = '[ ["Month", "Usage"]';
-        // var cnt = 0;
-        // response.forEach(function(entry){
-        //   // var h = i+1;
-        //   cnt += 1;
-        //   dataFrame += ',["'+ entry.slot.parkingslot_id +'", '+entry.count+']';
-        // });
-        //
-        // dataFrame = dataFrame + ' ]';
-        // console.log(dataFrame);
-        //
-        // var map = this.$.chart2;
-        // map.setAttribute('type', 'column');
-        // map.setAttribute('data', dataFrame);
-
       },
       arrayItem: function(change, index, path) {
-        // this.get(path, root) returns a value for a path
-        // relative to a root object.
         return this.get(path, change.base[index]);
       }
 

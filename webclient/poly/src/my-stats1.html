@@ -96,22 +96,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Hourly Parking Usage</h1>
       <p>Car Driver Parking Statistics in a Day</p>
       <div>
-        <label>Date</label>
-
-        <!-- <input is="iron-input" id="dayinput"> -->
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot1" value=""></paper-input>
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot1" value="[[facility_id]]"></paper-input>
         <input id="date1" type="date" value="[[date]]">
         <paper-button id="name" on-tap="ajaxData1" raised>Update</paper-button>
 
-         <!-- Chart js -->
         <canvas id="chart1"></canvas>
-
-        <!-- <google-chart id="chart1"
-          type="column"
-          options='{"title": "Daily Parking Graph"}'>
-        </google-chart> -->
-
-
       </div>
     </div>
 
@@ -122,13 +111,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div>
         <label>Month</label>
 
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot2" value=""></paper-input>
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot2" value="[[facility_id]]"></paper-input>
         <input id="date2" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData2" raised>Update</paper-button>
 
-        <!-- Chart js -->
        <canvas id="chart2"></canvas>
-
 
       </div>
     </div>
@@ -138,13 +125,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Monthly Parking Usage</h1>
       <p>Car Driver Parking Statistics in a year</p>
       <div>
-        <label>Year</label>
 
-        <paper-input class="stat_lot" label="Facility ID" id="stat_lot3" value=""></paper-input>
+        <paper-input class="stat_lot" label="Facility ID" id="stat_lot3" value="[[facility_id]]"></paper-input>
         <input id="date3" type="month" value="[[month]]">
         <paper-button id="name" on-tap="ajaxData3" raised>Update</paper-button>
 
-        <!-- Chart js -->
        <canvas id="chart3"></canvas>
 
       </div>
@@ -163,14 +148,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         token : String,
         facility_id : String,
         date : String,
-        month : String
+        month : String,
+        facility_id : {
+            type : String,
+            value : '1'
+        }
 
 
       },
       ready : function(){
         this.hello2 = "hello tests";
         console.log(this.ip);
+        this.token = sessionStorage.getItem('token');
         this.init_ajax();
+
 
       },
       init_ajax: function(){
@@ -191,11 +182,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.date = date;
         this.month = mon;
 
-        this.$.statsAjax1.params = {"facility_id" : 1, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
+        console.log(this.token);
+
+        this.$.statsAjax1.params = {"facility_id" : this.facility_id, "token":this.token, "year":year, "month":month, "day":day, "type":"h"};
         this.$.statsAjax1.generateRequest();
-        this.$.statsAjax2.params = {"facility_id" : 1, "token":this.token,"year":year, "month":month, "type":"d"};
+        this.$.statsAjax2.params = {"facility_id" : this.facility_id, "token":this.token,"year":year, "month":month, "type":"d"};
         this.$.statsAjax2.generateRequest();
-        this.$.statsAjax3.params = {"facility_id" : 1, "token":this.token,"year":year, "type":"m"};
+        this.$.statsAjax3.params = {"facility_id" : this.facility_id, "token":this.token,"year":year, "type":"m"};
         this.$.statsAjax3.generateRequest();
       },
       ajaxData1 : function(){
@@ -296,24 +289,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         var ctx = this.$.chart2.getContext("2d");
         var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 13, scaleFontColor : "#ffa45e"});
-
-        // google chart
-        // var response = this.$.statsAjax2.lastResponse;
-        // var length = response.length;
-        //
-        // var dataFrame = '[ ["Day", "Usage"]';
-        // var cnt = 0;
-        // response.forEach(function(entry){
-        //   cnt += 1;
-        //   dataFrame += ',["'+ cnt +'", '+entry.count+']';
-        // });
-        //
-        // dataFrame = dataFrame + ' ]';
-        // console.log(dataFrame);
-        //
-        // var map = this.$.chart2;
-        // map.setAttribute('type', 'column');
-        // map.setAttribute('data', dataFrame);
       }
       ,
       stat03_response: function(request){

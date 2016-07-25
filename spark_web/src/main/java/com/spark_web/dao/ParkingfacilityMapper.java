@@ -6,4 +6,8 @@ public interface ParkingfacilityMapper {
 
 	ParkingFacility FindParkingFacilityInfo(int parkingfacility_id);
 
+	void UpdateParkingFacilityCharge(ParkingFacility parkingfacility);
+
+	void UpdateParkingFacilityGracePeriod(ParkingFacility parkingfacility);
+
 }

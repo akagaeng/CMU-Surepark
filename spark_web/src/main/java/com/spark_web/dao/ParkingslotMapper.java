@@ -1,7 +1,6 @@
 package com.spark_web.dao;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.spark_web.domain.ParkingSlot;
 import com.spark_web.domain.Result_Resv_Info;

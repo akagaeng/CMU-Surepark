@@ -1,20 +1,33 @@
 package com.spark_web.domain;
 
 public class Admin {
-	private String user_id;
-	private String user_pw;
-	public String getUser_id() {
-		return user_id;
+
+	String admin_id;
+	String admin_password;
+	String admin_token;
+
+	public String getAdmin_id() {
+		return admin_id;
 	}
-	public void setUser_id(String user_id) {
-		this.user_id = user_id;
+
+	public void setAdmin_id(String admin_id) {
+		this.admin_id = admin_id;
 	}
-	public String getUser_pw() {
-		return user_pw;
+
+	public String getAdmin_password() {
+		return admin_password;
 	}
-	public void setUser_pw(String user_pw) {
-		this.user_pw = user_pw;
+
+	public void setAdmin_password(String admin_password) {
+		this.admin_password = admin_password;
 	}
-	
-	
+
+	public String getAdmin_token() {
+		return admin_token;
+	}
+
+	public void setAdmin_token(String admin_token) {
+		this.admin_token = admin_token;
+	}
+
 }

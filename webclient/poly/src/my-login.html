@@ -16,7 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-
+<script src="script/aes.js"></script>
 <dom-module id="my-login">
 
   <template>
@@ -89,7 +89,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </iron-ajax>
 
     <div class="card">
-
+      {{userId_e}}
+      {{password_e}}
       <h1>Surepark System Login</h1>
 
       <paper-input id="userId" label="User ID"></paper-input>
@@ -128,7 +129,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       doLogin: function(){
         var userId = this.$.userId.value;
         var password = this.$.password.value;
-        this.$.loginAjax.params = {"userId":userId, "password":password};
+        var userId_e = CryptoJS.AES.encrypt(userId, "team3");
+        var password_e = CryptoJS.AES.encrypt(password, "team3");
+        this.userId_e = userId_e;
+        this.password_e = password_e;
+        this.$.loginAjax.params = {"userId":userId_e, "password":password_e};
         this.$.loginAjax.generateRequest();
 
       },

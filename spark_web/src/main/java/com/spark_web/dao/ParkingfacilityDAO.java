@@ -46,4 +46,30 @@ public class ParkingfacilityDAO {
 		}
 	}
 
+	public void UpdateParkingFacilityCharge(ParkingFacility parkingfacility) {
+		// TODO Auto-generated method stub
+
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ParkingfacilityMapper mapper = session.getMapper(ParkingfacilityMapper.class);
+
+			mapper.UpdateParkingFacilityCharge(parkingfacility);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	public void UpdateParkingFacilityGracePeriod(ParkingFacility parkingfacility) {
+		// TODO Auto-generated method stub
+
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ParkingfacilityMapper mapper = session.getMapper(ParkingfacilityMapper.class);
+
+			mapper.UpdateParkingFacilityGracePeriod(parkingfacility);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
 }

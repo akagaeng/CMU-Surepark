@@ -171,6 +171,62 @@ public class ResvDAO {
 			// TODO: handle exception
 		}
 	}
+
+	public int FindStaricalParkingPeakTimeHour(ParkingStaticalData parkingstaticaldata) {
+		// TODO Auto-generated method stub
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ResvMapper mapper = session.getMapper(ResvMapper.class);
+			return mapper.FindStaricalParkingPeakTimeHour(parkingstaticaldata);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return 0;
+		}	
+	}
+
+	public int FindStaricalParkingPeakTimeDay(ParkingStaticalData parkingstaticaldata) {
+		// TODO Auto-generated method stub
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ResvMapper mapper = session.getMapper(ResvMapper.class);
+			return mapper.FindStaricalParkingPeakTimeDay(parkingstaticaldata);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return 0;
+		}	
+	}
+
+	public int FindStaricalParkingPeakTimeMonth(ParkingStaticalData parkingstaticaldata) {
+		// TODO Auto-generated method stub
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ResvMapper mapper = session.getMapper(ResvMapper.class);
+			return mapper.FindStaricalParkingPeakTimeMonth(parkingstaticaldata);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return 0;
+		}	
+	}
+
+	public int FindStaricalParkingRevenueDay(ParkingStaticalData parkingstaticaldata) {
+		// TODO Auto-generated method stub
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ResvMapper mapper = session.getMapper(ResvMapper.class);
+			return mapper.FindStaricalParkingRevenueDay(parkingstaticaldata);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return 0;
+		}	
+	}
+	
+	public int FindStaricalParkingRevenueMonth(ParkingStaticalData parkingstaticaldata) {
+		// TODO Auto-generated method stub
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ResvMapper mapper = session.getMapper(ResvMapper.class);
+			return mapper.FindStaricalParkingRevenueMonth(parkingstaticaldata);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return 0;
+		}	
+	}
+	
 	
 	public int FindStaricalParkingSlotDayUsage(SlotUsage slotusage){
 		// TODO Auto-generated method stub
@@ -196,36 +252,36 @@ public class ResvDAO {
 		
 	}
 
-	public int FindStaricalParkingPeakTimeHour(ParkingStaticalData parkingstaticaldata) {
+	public double FindStaricalParkingOccupancyHour(ParkingStaticalData parkingstaticaldata) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ResvMapper mapper = session.getMapper(ResvMapper.class);
-			return mapper.FindStaricalParkingPeakTimeHour(parkingstaticaldata);
+			return mapper.FindStaricalParkingOccupancyHour(parkingstaticaldata);
 		} catch (Exception e) {
 			// TODO: handle exception
-			return -1;
-		}	
+			return 0;
+		}
 	}
 
-	public int FindStaricalParkingPeakTimeDay(ParkingStaticalData parkingstaticaldata) {
+	public double FindStaricalParkingOccupancyDay(ParkingStaticalData parkingstaticaldata) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ResvMapper mapper = session.getMapper(ResvMapper.class);
-			return mapper.FindStaricalParkingPeakTimeDay(parkingstaticaldata);
+			return mapper.FindStaricalParkingOccupancyDay(parkingstaticaldata);
 		} catch (Exception e) {
 			// TODO: handle exception
-			return -1;
-		}	
+			return 0;
+		}
 	}
 
-	public int FindStaricalParkingPeakTimeMonth(ParkingStaticalData parkingstaticaldata) {
+	public double FindStaricalParkingOccupancyMonth(ParkingStaticalData parkingstaticaldata) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ResvMapper mapper = session.getMapper(ResvMapper.class);
-			return mapper.FindStaricalParkingPeakTimeMonth(parkingstaticaldata);
+			return mapper.FindStaricalParkingOccupancyMonth(parkingstaticaldata);
 		} catch (Exception e) {
 			// TODO: handle exception
-			return -1;
-		}	
+			return 0;
+		}
 	}
 }

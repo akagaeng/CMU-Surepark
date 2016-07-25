@@ -155,7 +155,7 @@ public class ParkingSerivice extends PushNotificationService {
 					resv.setResv_cancel("MOVE,"+ parkingfacility_id + "-" + parkingslot_floor + "-" + parkingslot_zone);
 					
 					resvdao.UpdateParkingExitTime(resv);
-					parkingslotdao.UpdateParkingSlotEmptyStatus(parkingslotseq);
+					parkingslotdao.UpdateParkingSlotEmptyStatus(resv.getParkingslot_seq());
 
 					PaymentService payment = new PaymentService();
 					System.out.println(parking_price);
@@ -171,11 +171,6 @@ public class ParkingSerivice extends PushNotificationService {
 			// TODO: handle exception
 			return "fail";
 		}
-	}
-
-	public List<ParkingSlot> ParkingSlotList() {
-		// TODO Auto-generated method stub
-		return parkingslotdao.FindParkingSlotInfo();
 	}
 
 	public int CalculatePay(String starttime, String exittime, int am_price, int pm_price) {
@@ -234,5 +229,10 @@ public class ParkingSerivice extends PushNotificationService {
 
 		return totalpay;
 
+	}
+	
+	public List<ParkingSlot> ParkingSlotList() {
+		// TODO Auto-generated method stub
+		return parkingslotdao.FindParkingSlotInfo();
 	}
 }

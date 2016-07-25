@@ -28,15 +28,25 @@ public interface ResvMapper {
 	public Resv FindParkingSlotStateMoving(String resv_cancel);
 	
 	public void UpdateParkingExitTime(Resv resv);
-	
-	public int FindStaricalParkingSlotDayUsage(SlotUsage slotusage);
-	
-	public int FindStaricalParkingSlotMonthUsage(SlotUsage slotusage);
 
 	public int FindStaricalParkingPeakTimeHour(ParkingStaticalData parkingstaticaldata);
 
 	public int FindStaricalParkingPeakTimeDay(ParkingStaticalData parkingstaticaldata);
 
 	public int FindStaricalParkingPeakTimeMonth(ParkingStaticalData parkingstaticaldata);
+
+	public int FindStaricalParkingRevenueDay(ParkingStaticalData parkingstaticaldata);
+
+	public int FindStaricalParkingRevenueMonth(ParkingStaticalData parkingstaticaldata);
+	
+	public int FindStaricalParkingSlotDayUsage(SlotUsage slotusage);
+	
+	public int FindStaricalParkingSlotMonthUsage(SlotUsage slotusage);
+
+	public double FindStaricalParkingOccupancyHour(ParkingStaticalData parkingstaticaldata);
+
+	public double FindStaricalParkingOccupancyDay(ParkingStaticalData parkingstaticaldata);
+
+	public double FindStaricalParkingOccupancyMonth(ParkingStaticalData parkingstaticaldata);
 
 }

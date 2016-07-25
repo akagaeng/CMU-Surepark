@@ -8,13 +8,14 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class PushNotificationService {
 
-	public static void PushNotification(String topic, String content) {
+	public static void PushNotification(String publish, String content) {
 
-		// String topic = "topic22";
+		String topic = "topic/";
 		// String content = "test";
 		int qos = 2;
+		String broker = "tcp://172.16.30.237:1883";
 		//String broker = "tcp://192.168.1.169:1883";
-		String broker = "tcp://128.237.135.101:1883";
+		//String broker = "tcp://128.237.135.101:1883";
 		String clientId = "Server";
 		MemoryPersistence persistence = new MemoryPersistence();
 
@@ -28,7 +29,7 @@ public class PushNotificationService {
 			System.out.println("Publishing message: " + content);
 			MqttMessage message = new MqttMessage(content.getBytes());
 			message.setQos(qos);
-			sampleClient.publish(topic, message);
+			sampleClient.publish(topic+publish, message);
 			System.out.println("Message published");
 			sampleClient.disconnect();
 			System.out.println("Disconnected");

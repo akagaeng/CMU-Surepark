@@ -45,7 +45,7 @@
 		where
 			A.resv_phonenum = #{resv_phonenum}
 		and
-			A.resv_cancel = "resv"
+			(A.resv_cancel = "resv" OR	A.resv_cancel = "parking")
 	</select>
 
 	<update id="UpdateCancelResv" parameterType="String">
@@ -154,6 +154,129 @@
 			resv_cancel = #{resv_cancel}
 	</select>	
 	
+	<select id="FindStaricalParkingPeakTimeHour" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+		select 
+			SUM((YEAR(A.parking_exittime)-YEAR(A.parking_starttime))*365*24 +
+			(MONTH(A.parking_exittime)-MONTH(A.parking_starttime))*31*24 +
+			(DAY(A.parking_exittime)-DAY(A.parking_starttime))*24 +
+			HOUR(A.parking_exittime)-HOUR(A.parking_starttime) +
+			Ceil((MINUTE(A.parking_exittime)-MINUTE(A.parking_starttime))/60))		 	
+		from
+			t_resv as A
+		join
+			t_parkingslot as B
+		on
+			A.parkingslot_seq = B.parkingslot_seq
+		where
+			B.parkingfacility_id = #{parkingfacility_id}
+		and
+			YEAR(A.parking_starttime) <![CDATA[<=]]> #{year}
+		and
+			YEAR(A.parking_exittime) <![CDATA[>=]]> #{year}
+		and
+			MONTH(A.parking_starttime) <![CDATA[<=]]> #{month}	
+		and
+			MONTH(A.parking_exittime) <![CDATA[>=]]> #{month}	
+		and
+			DAY(A.parking_starttime) <![CDATA[<=]]> #{day}
+		and
+			DAY(A.parking_exittime) <![CDATA[>=]]> #{day}
+		and
+			HOUR(A.parking_starttime) <![CDATA[<=]]> #{hour}
+		and
+			HOUR(A.parking_exittime) <![CDATA[>=]]> #{hour}
+	</select>
+	
+	<select id="FindStaricalParkingPeakTimeDay" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+		select 
+			SUM((YEAR(A.parking_exittime)-YEAR(A.parking_starttime))*365*24 +
+			(MONTH(A.parking_exittime)-MONTH(A.parking_starttime))*31*24 +
+			(DAY(A.parking_exittime)-DAY(A.parking_starttime))*24 +
+			HOUR(A.parking_exittime)-HOUR(A.parking_starttime) +
+			Ceil((MINUTE(A.parking_exittime)-MINUTE(A.parking_starttime))/60))	 	
+		from
+			t_resv as A
+		join
+			t_parkingslot as B
+		on
+			A.parkingslot_seq = B.parkingslot_seq
+		where
+			B.parkingfacility_id = #{parkingfacility_id}
+		and
+			YEAR(A.parking_starttime) <![CDATA[<=]]> #{year}
+		and
+			YEAR(A.parking_exittime) <![CDATA[>=]]> #{year}
+		and
+			MONTH(A.parking_starttime) <![CDATA[<=]]> #{month}	
+		and
+			MONTH(A.parking_exittime) <![CDATA[>=]]> #{month}	
+		and
+			DAY(A.parking_starttime) <![CDATA[<=]]> #{day}
+		and
+			DAY(A.parking_exittime) <![CDATA[>=]]> #{day}
+	</select>
+	
+	<select id="FindStaricalParkingPeakTimeMonth" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+		select 
+			SUM((YEAR(A.parking_exittime)-YEAR(A.parking_starttime))*365*24 +
+			(MONTH(A.parking_exittime)-MONTH(A.parking_starttime))*31*24 +
+			(DAY(A.parking_exittime)-DAY(A.parking_starttime))*24 +
+			HOUR(A.parking_exittime)-HOUR(A.parking_starttime) +
+			Ceil((MINUTE(A.parking_exittime)-MINUTE(A.parking_starttime))/60))	 	
+		from
+			t_resv as A
+		join
+			t_parkingslot as B
+		on
+			A.parkingslot_seq = B.parkingslot_seq
+		where
+			B.parkingfacility_id = #{parkingfacility_id}
+		and
+			YEAR(A.parking_starttime) <![CDATA[<=]]> #{year}
+		and
+			YEAR(A.parking_exittime) <![CDATA[>=]]> #{year}
+		and
+			MONTH(A.parking_starttime) <![CDATA[<=]]> #{month}	
+		and
+			MONTH(A.parking_exittime) <![CDATA[>=]]> #{month}	
+	</select>
+	
+	<select id="FindStaricalParkingRevenueDay" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+		select 
+			SUM(A.parking_price)	
+		from
+			t_resv as A
+		join
+			t_parkingslot as B
+		on
+			A.parkingslot_seq = B.parkingslot_seq
+		where
+			B.parkingfacility_id = #{parkingfacility_id}
+		and
+			DAY(A.parking_exittime) = #{day}	
+		and
+			MONTH(A.parking_exittime) = #{month}			
+		and
+			YEAR(A.parking_exittime) = #{year}		
+	</select>
+	
+	<select id="FindStaricalParkingRevenueMonth" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+		select 
+			SUM(A.parking_price)	
+		from
+			t_resv as A
+		join
+			t_parkingslot as B
+		on
+			A.parkingslot_seq = B.parkingslot_seq
+		where
+			B.parkingfacility_id = #{parkingfacility_id}
+		and
+			MONTH(A.parking_exittime) = #{month}	
+		and
+			YEAR(A.parking_exittime) = #{year}
+	</select>
+
 	<select id="FindStaricalParkingSlotDayUsage" parameterType="com.spark_web.domain.SlotUsage" resultType="Integer">
 		select 
 			count(*)	 	
@@ -192,9 +315,13 @@
 			MONTH(parking_exittime) <![CDATA[>=]]> MONTH(#{datetime})
 	</select>
 	
-	<select id="FindStaricalParkingPeakTimeHour" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+	<select id="FindStaricalParkingOccupancyHour" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Double">
 		select 
-			count(*)	 	
+			SUM((YEAR(A.parking_exittime)-YEAR(A.parking_starttime))*365*24 +
+			(MONTH(A.parking_exittime)-MONTH(A.parking_starttime))*31*24 +
+			(DAY(A.parking_exittime)-DAY(A.parking_starttime))*24 +
+			HOUR(A.parking_exittime)-HOUR(A.parking_starttime) +
+			Ceil((MINUTE(A.parking_exittime)-MINUTE(A.parking_starttime))/60)) / count(*) 		 	
 		from
 			t_resv as A
 		join
@@ -204,14 +331,30 @@
 		where
 			B.parkingfacility_id = #{parkingfacility_id}
 		and
-			A.parking_starttime <![CDATA[<=]]> #{datetime}
+			YEAR(A.parking_starttime) <![CDATA[<=]]> #{year}
 		and
-			A.parking_exittime <![CDATA[>=]]> #{datetime}
+			YEAR(A.parking_exittime) <![CDATA[>=]]> #{year}
+		and
+			MONTH(A.parking_starttime) <![CDATA[<=]]> #{month}	
+		and
+			MONTH(A.parking_exittime) <![CDATA[>=]]> #{month}	
+		and
+			DAY(A.parking_starttime) <![CDATA[<=]]> #{day}
+		and
+			DAY(A.parking_exittime) <![CDATA[>=]]> #{day}
+		and
+			HOUR(A.parking_starttime) <![CDATA[<=]]> #{hour}
+		and
+			HOUR(A.parking_exittime) <![CDATA[>=]]> #{hour}
 	</select>
 	
-	<select id="FindStaricalParkingPeakTimeDay" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+	<select id="FindStaricalParkingOccupancyDay" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Double">
 		select 
-			count(*)	 	
+			SUM((YEAR(A.parking_exittime)-YEAR(A.parking_starttime))*365*24 +
+			(MONTH(A.parking_exittime)-MONTH(A.parking_starttime))*31*24 +
+			(DAY(A.parking_exittime)-DAY(A.parking_starttime))*24 +
+			HOUR(A.parking_exittime)-HOUR(A.parking_starttime) +
+			Ceil((MINUTE(A.parking_exittime)-MINUTE(A.parking_starttime))/60)) / count(*)	 	
 		from
 			t_resv as A
 		join
@@ -221,22 +364,26 @@
 		where
 			B.parkingfacility_id = #{parkingfacility_id}
 		and
-			YEAR(A.parking_starttime) <![CDATA[<=]]> YEAR(#{datetime})
+			YEAR(A.parking_starttime) <![CDATA[<=]]> #{year}
 		and
-			YEAR(A.parking_exittime) <![CDATA[>=]]> YEAR(#{datetime})	
+			YEAR(A.parking_exittime) <![CDATA[>=]]> #{year}
 		and
-			MONTH(A.parking_starttime) <![CDATA[<=]]> MONTH(#{datetime})
+			MONTH(A.parking_starttime) <![CDATA[<=]]> #{month}	
 		and
-			MONTH(A.parking_exittime) <![CDATA[>=]]> MONTH(#{datetime})
+			MONTH(A.parking_exittime) <![CDATA[>=]]> #{month}	
 		and
-			DAY(A.parking_starttime) <![CDATA[<=]]> DAY(#{datetime})
+			DAY(A.parking_starttime) <![CDATA[<=]]> #{day}
 		and
-			DAY(A.parking_exittime) <![CDATA[>=]]> DAY(#{datetime})
+			DAY(A.parking_exittime) <![CDATA[>=]]> #{day}
 	</select>
 	
-	<select id="FindStaricalParkingPeakTimeMonth" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Integer">
+	<select id="FindStaricalParkingOccupancyMonth" parameterType="com.spark_web.domain.ParkingStaticalData" resultType="Double">
 		select 
-			count(*)	 	
+			SUM((YEAR(A.parking_exittime)-YEAR(A.parking_starttime))*365*24 +
+			(MONTH(A.parking_exittime)-MONTH(A.parking_starttime))*31*24 +
+			(DAY(A.parking_exittime)-DAY(A.parking_starttime))*24 +
+			HOUR(A.parking_exittime)-HOUR(A.parking_starttime) +
+			Ceil((MINUTE(A.parking_exittime)-MINUTE(A.parking_starttime))/60)) / count(*)	 	
 		from
 			t_resv as A
 		join
@@ -246,13 +393,14 @@
 		where
 			B.parkingfacility_id = #{parkingfacility_id}
 		and
-			YEAR(A.parking_starttime) <![CDATA[<=]]> YEAR(#{datetime})
+			YEAR(A.parking_starttime) <![CDATA[<=]]> #{year}
 		and
-			YEAR(A.parking_exittime) <![CDATA[>=]]> YEAR(#{datetime})	
+			YEAR(A.parking_exittime) <![CDATA[>=]]> #{year}
 		and
-			MONTH(A.parking_starttime) <![CDATA[<=]]> MONTH(#{datetime})
+			MONTH(A.parking_starttime) <![CDATA[<=]]> #{month}	
 		and
-			MONTH(A.parking_exittime) <![CDATA[>=]]> MONTH(#{datetime})
+			MONTH(A.parking_exittime) <![CDATA[>=]]> #{month}	
 	</select>
-
+	
+	
 </mapper> 

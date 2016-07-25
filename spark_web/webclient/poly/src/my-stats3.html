@@ -1,0 +1,286 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<script src="script/Chart.js"></script>
+<!-- <link rel="import" href="../bower_components/polymer-date-picker/polymer-date-picker.html"> -->
+<!-- <script src="../bower_components/Chart.js/dist/Chart.js"></script> -->
+<!-- <script src="script/login.js"></script> -->
+
+<dom-module id="my-stats3">
+
+  <template id="app">
+
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .circle {
+        display: inline-block;
+        height: 64px;
+        width: 64px;
+        border-radius: 50%;
+        background: #ddd;
+        line-height: 64px;
+        font-size: 30px;
+        color: #555;
+        text-align: center;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 16px 0;
+        color: #212121;
+      }
+      google-chart {
+        width: 90%;
+      }
+      .chart {
+        width: 90%;
+      }
+      canvas{
+        background-color : #eee;
+        width: 90%;
+      }
+    </style>
+
+    <iron-ajax auto
+        id = "statsAjax1"
+        url="{{ip}}/api/admin/stats/slot"
+        params='{"year":"2015", "month":"12", "day":"13", "type":"d"}'
+        handle-as="json"
+        on-response="stat01_response"
+        last-response="{{stats01}}">
+    </iron-ajax>
+
+    <iron-ajax auto
+        id = "statsAjax2"
+        url="{{ip}}/api/admin/stats/slot"
+        params='{"year":"2015", "month":"12", "day":"13", "type":"m"}'
+        handle-as="json"
+        on-response="stat02_response"
+        last-response="{{stats02}}">
+    </iron-ajax>
+
+
+    <div class="card">
+      <div class="circle">1</div>
+      <h1>Daily Parking Usage</h1>
+      <p>Car Driver Parking Statistics in a Day</p>
+
+      <div>
+        <label>Date</label>
+
+        <!-- <input is="iron-input" id="dayinput"> -->
+        <input id="date1" type="date">
+        <paper-button id="name" on-tap="ajaxData1" raised>Update</paper-button>
+
+        <!-- chartjs  -->
+        <canvas id="chart1"></canvas>
+
+        <!-- <google-chart id="chart1"
+          type="column"
+          options='{"title": "Daily Parking Graph","hAxis":{"title": "Count"},"vAxis":{"title": "Hour", "minValue": 10}}'>
+        </google-chart> -->
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="circle">2</div>
+      <h1>Monthly Parking Usage</h1>
+      <p>Car Driver Parking Statistics in a Month</p>
+      <div>
+        <label>Month</label>
+
+
+        <input id="date2" type="month">
+        <paper-button id="name" on-tap="ajaxData2" raised>Update</paper-button>
+
+        <!-- chartjs -->
+        <canvas id="chart2"></canvas>
+
+        <!-- <google-chart id="chart2"
+          type="column"
+          options='{"title": "Monthly Parking Graph"}'>
+        </google-chart> -->
+
+      </div>
+    </div>
+
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'my-stats3',
+      properties:{
+        ip: String,
+        token : String
+      },
+      ready : function(){
+        console.log(this.ip);
+        var token = sessionStorage.getItem("token");
+        this.token = token;
+        if (!token){
+          console.log("token is not existed");
+          this.page = "login";
+        }
+
+      },
+      ajaxData1 : function(){
+        var date = this.$.date1.value;
+        console.log(date);
+        date = date.split("-");
+        year = date[0];
+        month = date[1];
+        day = date[2];
+        // console.log(year, month, day);
+        this.$.statsAjax1.params = {"token":this.token,"year":year, "month":month, "day":day, "type":"d"};
+
+        this.$.statsAjax1.generateRequest();
+
+      },
+      ajaxData2 : function(){
+        var date = this.$.date2.value;
+        console.log(date);
+        date = date.split("-");
+        year = date[0];
+        month = date[1];
+        day = date[2];
+        // console.log(year, month, day);
+        this.$.statsAjax2.params = {"token":this.token,"year":year, "month":month, "day":day, "type":"m"};
+
+        this.$.statsAjax2.generateRequest();
+
+      },
+      stat01_response: function(request){
+        // Chartjs
+        var response = this.$.statsAjax1.lastResponse;
+        var length = response.length;
+
+        var labels = [];
+        var data = []
+        response.forEach(function(entry){
+          labels.push(entry.slot.parkingslot_id);
+          data.push(entry.count);
+        });
+
+        var BarChart = {
+            labels: labels,
+            datasets: [
+            {
+              label: "hello",
+              fillColor: "rgba(86,138,196,0.5)",
+              strokeColor: "rgba(255,255,255,1)",
+              borderWidth:1,
+              data: data
+            }
+          ]
+        }
+        var ctx = this.$.chart1.getContext("2d");
+        var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 15, scaleFontColor : "#783329"});
+
+        // google chart
+        // var response = this.$.statsAjax1.lastResponse;
+        //
+        // var length = response.length;
+        // console.log(length);
+        //
+        // var dataFrame = '[ ["Day", "Usage"]';
+        // var cnt = 0;
+        // response.forEach(function(entry){
+        //   // var h = i+1;
+        //   cnt += 1;
+        //   dataFrame += ',["'+ entry.slot.parkingslot_id +'", '+entry.count+']';
+        // });
+        //
+        // dataFrame = dataFrame + ' ]';
+        // console.log(dataFrame);
+        //
+        // var map = this.$.chart1;
+        // map.setAttribute('type', 'column');
+        // map.setAttribute('data', dataFrame);
+
+
+      },
+      stat02_response: function(request){
+
+        // Chartjs
+        var response = this.$.statsAjax2.lastResponse;
+        var length = response.length;
+
+        var labels = [];
+        var data = []
+        response.forEach(function(entry){
+          labels.push(entry.slot.parkingslot_id);
+          data.push(entry.count);
+        });
+
+        var BarChart = {
+            labels: labels,
+            datasets: [
+            {
+              fillColor: "rgba(74,84,199,0.5)",
+              strokeColor: "rgba(255,255,255,1)",
+              data: data
+            }
+          ]
+        }
+        var ctx = this.$.chart2.getContext("2d");
+        var myBarChart = new Chart(ctx).Bar(BarChart, {scaleFontSize : 15, scaleFontColor : "#ffa45e"});
+
+
+        // google chart
+        // var response = this.$.statsAjax2.lastResponse;
+        // var length = response.length;
+        //
+        // var dataFrame = '[ ["Month", "Usage"]';
+        // var cnt = 0;
+        // response.forEach(function(entry){
+        //   // var h = i+1;
+        //   cnt += 1;
+        //   dataFrame += ',["'+ entry.slot.parkingslot_id +'", '+entry.count+']';
+        // });
+        //
+        // dataFrame = dataFrame + ' ]';
+        // console.log(dataFrame);
+        //
+        // var map = this.$.chart2;
+        // map.setAttribute('type', 'column');
+        // map.setAttribute('data', dataFrame);
+
+      },
+      arrayItem: function(change, index, path) {
+        // this.get(path, root) returns a value for a path
+        // relative to a root object.
+        return this.get(path, change.base[index]);
+      }
+
+    });
+
+
+  </script>
+
+</dom-module>

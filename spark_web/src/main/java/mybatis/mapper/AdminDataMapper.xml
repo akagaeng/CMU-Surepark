@@ -3,13 +3,39 @@
 
 <mapper namespace="com.spark_web.dao.AdminMapper">
 
-	<select id="FindAdminData" parameterType="string" resultType="String">
+	<select id="FindAdminData" parameterType="String" resultType="String">
 		select
 			admin_password
 		from 
 			t_admin
 		where 
-			admin_id=#{admin_id}
+			admin_id=#{userid}
 	</select>
+	
+	<update id="UpdateAdminToken" parameterType="com.spark_web.domain.Admin">
+		update 
+			t_admin
+		set
+			admin_token = #{admin_token}
+		where 
+			admin_id=#{admin_id}
+	</update>
 
+	<select id="FindAdminToken" parameterType="String" resultType="String">
+		select
+			admin_token
+		from 
+			t_admin
+		where 
+			admin_token = #{token}
+	</select>
+	
+	<update id="UpdateAdminlogout" parameterType="String">
+		update 
+			t_admin
+		set
+			admin_token = NULL
+		where 
+			admin_token=#{token}
+	</update>
 </mapper> 

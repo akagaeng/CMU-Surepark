@@ -1,0 +1,194 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<script src="script/properties.js"></script>
+
+<dom-module id="attendant-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #app {
+        width : 80%;
+        margin: 0 auto;
+      }
+      paper-card{
+        width : 90%;
+        margin : 10px 10px;
+      }
+      .slot{
+        width : 120px;
+        height : 180px;
+        background-color: #A6D971;
+        border-style: solid;
+        border-width: 2px;
+        border-color: black;
+        border-radius: 5px;
+        display: inline-block;
+      }
+      .slot.state_t{
+        background-color: #E8553F;
+      }
+      carInfo{
+        display: block;
+      }
+      b{
+        color: red;
+      }
+      #atd_img{
+        width : 400px;
+      }
+    </style>
+
+    <iron-ajax
+        id = "authAjax"
+        url="{{ip}}/api/attendant/authentication"
+        handle-as="json"
+        method="post"
+        on-response="authResponse"
+        last-response="{{response}}">
+    </iron-ajax>
+
+    <iron-ajax
+        auto
+        id = "monitorAjax"
+        url="{{ip}}/api/attendant/monitor"
+        handle-as="json"
+        last-response="{{monitor}}">
+    </iron-ajax>
+
+    <div id="app">
+
+      <paper-card id="atd_img" image="imgs/surepark.jpg">
+        <div class="card-content">
+          Surepark Attendant System
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content">
+          Attendant Check In
+        </div>
+        <div class="card-actions">
+
+          <paper-input id="rsvNum" label="Reservation Number"></paper-input>
+          <paper-button on-tap="submitRsvNum" raised>Submit</paper-button>
+          Result : {{response}}
+
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content">
+          Facility Monitoring
+          <template is="dom-if" if="{{monitor}}" restamp="true">
+            <b>Server alive!</b>
+          </template>
+          <template is="dom-if" if="{{!monitor}}" restamp="true">
+            <b>Server Dead!</b>
+          </template>
+        </div>
+
+        <div class="card-actions">
+          <template is="dom-repeat" items="{{monitor}}">
+            <!-- {{item.parkingslot_state}} -->
+            <template is="dom-if" if="{{pstatus(item.parkingslot_state)}}">
+              <div class="slot state_t">
+                <div role="listbox">
+                  <paper-item >ID : {{item.parkingslot_id}}</paper-item>
+                  <paper-item>Floor : {{item.parkingslot_floor}}</paper-item>
+                  <paper-item>Zone : {{item.parkingslot_zone}}</paper-item>
+                  <paper-item>State : {{item.parkingslot_state}}</paper-item>
+                </div>
+              </div>
+            </template>
+            <template is="dom-if" if="{{!pstatus(item.parkingslot_state)}}">
+              <div class="slot state_f">
+                <div role="listbox">
+                  <paper-item >ID : {{item.parkingslot_id}}</paper-item>
+                  <paper-item>Floor : {{item.parkingslot_floor}}</paper-item>
+                  <paper-item>Zone : {{item.parkingslot_zone}}</paper-item>
+                  <paper-item>State : {{item.parkingslot_state}}</paper-item>
+                </div>
+              </div>
+            </template>
+
+          </template>
+
+        </div>
+      </paper-card>
+    </div>
+
+    <paper-dialog id="dialog_s">
+      <h2>Check In Success!</h2>
+
+      <div class="buttons">
+        <paper-button dialog-confirm>Accept</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="dialog_f">
+      <h2>Check In failure!</h2>
+
+      <div class="buttons">
+        <paper-button dialog-confirm>Accept</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'attendant-app',
+      properties: {
+        prop1: {
+          type: String,
+          value: 'attendant-app',
+        },
+        ip : String
+      },
+      ready : function(){
+        // Monitor every 2 seconds
+        // console.log(properties.ip);
+        this.ip = properties.ip;
+        this.set('interval', setInterval(this.interval.bind(this), 2000));
+      },
+      submitRsvNum: function(){
+        var rsvNum = this.$.rsvNum.value;
+        console.log(rsvNum);
+        this.$.authAjax.params = {"rsvNum":rsvNum};
+        this.$.authAjax.generateRequest();
+
+      },
+      authResponse: function(){
+        var result = this.$.authAjax.lastResponse;
+        console.log(result);
+        if(result === "fail"){
+          this.$.dialog_f.open();
+        }else{
+          this.$.dialog_s.open();
+        }
+
+      },
+      interval : function(){
+        this.$.monitorAjax.generateRequest();
+      },
+      pstatus : function(item){
+        var result = (item === true);
+        console.log(result);
+        return result;
+      }
+
+    });
+
+
+
+  </script>
+</dom-module>

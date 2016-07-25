@@ -14,4 +14,23 @@
 		where
 			parkingfacility_id = #{parkingfacility_id}
 	</select>	
+	
+	<update id="UpdateParkingFacilityCharge" parameterType="com.spark_web.domain.ParkingFacility">
+		update 
+			t_parkingfacility
+		set
+			parkingfacility_am_price = #{parkingfacility_am_price},
+			parkingfacility_pm_price = #{parkingfacility_pm_price}
+		where 
+			parkingfacility_id = #{parkingfacility_id}
+	</update>
+	
+	<update id="UpdateParkingFacilityGracePeriod" parameterType="com.spark_web.domain.ParkingFacility">
+		update 
+			t_parkingfacility 
+		set
+			parkingfacility_graceperiod = #{parkingfacility_graceperiod}
+		where 
+			parkingfacility_id = #{parkingfacility_id}
+	</update>
 </mapper> 

@@ -1,0 +1,1 @@
+schtasks /create /sc minute /mo 1 /tn "MySQL BackUp Schedule" /tr C:\sql_backup\backup_scheduler.bat

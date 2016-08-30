@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MQTTSample</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="messageRecieved">Received message %1$s &lt;br/&gt; &lt;small&gt;Topic: %2$s &lt;/small&gt; </string>
+    <string name="notification">%1$s has received %2$s on topic %3$s</string>
+    <string name="notifyTitle">MQTT Message Received</string>
+</resources>

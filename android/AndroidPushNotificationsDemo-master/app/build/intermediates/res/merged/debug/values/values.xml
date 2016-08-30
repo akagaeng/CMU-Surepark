@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_color">#a2d03b</color>
+    <color name="text_color">#FFFFFF</color>
+    <string name="about">www.tokudu.com</string>
+    <string name="app_name">Push Demo</string>
+    <string name="hello">Hello World, PushActivity!</string>
+    <string name="start_service">Start Push service</string>
+    <string name="stop_service">Stop Push Service</string>
+    <string name="target">Your Device Target:</string>
+</resources>

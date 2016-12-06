@@ -78,7 +78,7 @@
       <p>Maximum waiting time until the drive arrives in the parking lot</p>
       <form is="iron-form" method="get" action="{{ip}}/api/admin/setting/period">
         <!-- <paper-input id="grace" name="grace" label="Grace Period" value="{{grace.time}}" auto-validate allowed-pattern="[0-9]*" error-message="number only!" required></paper-input> -->
-        <paper-input id="grace" name="grace" label="Grace Period" value="[[requsetInfo.parkingfacility_graceperiod]]" auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-input id="grace" name="grace" label="Grace Period (mins)" value="[[requsetInfo.parkingfacility_graceperiod]]" auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
         <paper-button raised on-tap="graceSubmit">Submit</paper-button>
         <div class="output"></div>
       </form>
@@ -90,8 +90,8 @@
       <p>Morning / Afternoon </p>
       <form is="iron-form" method="post" action="/" id="presubmit">
 
-        <paper-input id="morning" label="Morning Price" value="[[requsetInfo.parkingfacility_am_price]]" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
-        <paper-input id="afternoon" label="Afternoon Price" value="[[requsetInfo.parkingfacility_pm_price]]" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-input id="morning" label="Morning Price ($)" value="[[requsetInfo.parkingfacility_am_price]]" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
+        <paper-input id="afternoon" label="Afternoon Price ($)" value="[[requsetInfo.parkingfacility_pm_price]]" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input>
         <!-- <paper-input id="weekend" label="Weekend price" value="{{priceAjax.weekend}}" required auto-validate allowed-pattern="[0-9]" error-message="number only!" required></paper-input> -->
         <paper-button raised on-tap="priceSubmit">Submit</paper-button>
 

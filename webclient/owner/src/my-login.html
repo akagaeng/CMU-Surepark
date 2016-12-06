@@ -9,14 +9,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/google-chart/google-chart.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<!-- <script src="script/aes.js"></script> -->
+<script src="script/AesUtil.js"></script>
 <script src="script/aes.js"></script>
+<script src="script/pbkdf2.js"></script>
+<script src="script/jsencrypt.min.js"></script>
+<!-- <script src="script/publickey.js"></script> -->
+
 <dom-module id="my-login">
 
   <template>
@@ -89,8 +94,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </iron-ajax>
 
     <div class="card">
-      {{userId_e}}
-      {{password_e}}
       <h1>Surepark System Login</h1>
 
       <paper-input id="userId" label="User ID"></paper-input>
@@ -129,13 +132,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       doLogin: function(){
         var userId = this.$.userId.value;
         var password = this.$.password.value;
-        var userId_e = CryptoJS.AES.encrypt(userId, "team3");
-        var password_e = CryptoJS.AES.encrypt(password, "team3");
+        var userId_e = this.encrypt_rsa(userId);
+        var password_e = this.encrypt_rsa(password);
         this.userId_e = userId_e;
         this.password_e = password_e;
         this.$.loginAjax.params = {"userId":userId_e, "password":password_e};
         this.$.loginAjax.generateRequest();
 
+      },
+      encrypt_rsa : function(value)
+      {
+        // var encrypt = new JSEncrypt();
+        // // console.log(rsa.public);
+        // encrypt.setPublicKey(rsa.public);
+        // var encrypted = encrypt.encrypt(value);
+        // console.log(encrypted);
+        // // Decrypt with the private key...
+        // var decrypt = new JSEncrypt();
+        // decrypt.setPrivateKey(rsa.private);
+        // var uncrypted = decrypt.decrypt(encrypted);
+        // console.log(uncrypted);
+        // return encrypted;
+        console.log("login start");
+        var keySize = 128;
+        var iterations = iterationCount = 10000;
+
+        var iv = "F27D5C9927726BCEFE7510B1BDD3D137";
+        var salt = "3FF2EC019C627B945225DEBAD71A01B6985FE84C95A70EB132882F88C0A59A55";
+        var passPhrase = "passPhrase passPhrase aes encoding algorithm";
+
+        var plainText = value;
+
+        var aesUtil = new AesUtil(keySize, iterationCount)
+        var encrypt = aesUtil.encrypt(salt, iv, passPhrase, plainText);
+
+        // aesUtil = new AesUtil(keySize, iterationCount)
+        // var decrypt = aesUtil.decrypt(salt, iv, passPhrase, encrypt);
+
+        console.log("login : " + plainText);
+        // console.log("암호화 : " + encrypt);
+        // console.log("복호화 : " + decrypt);
+        return encrypt;
       },
       loginResponse: function(){
         var token = this.$.loginAjax.lastResponse;

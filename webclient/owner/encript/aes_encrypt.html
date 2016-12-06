@@ -1,0 +1,22 @@
+// GibberishAES.enc(string, password)
+// Defaults to 256 bit encryption
+<script src="gibberish-aes.js">
+
+</script>
+<script type="text/javascript">
+  // enc = GibberishAES.enc("admin", "89071632405379023843194080915302");
+  enc = GibberishAES.enc("admin", "89071632405379023843194080915302");
+  alert(enc);
+  GibberishAES.dec(enc, "ultra-strong-password");
+
+  // Now change size to 128 bits
+  GibberishAES.size(128);
+  enc = GibberishAES.enc("This sentence is not so secret", "1234");
+  GibberishAES.dec(enc, "1234");
+
+  // And finally 192 bits
+  GibberishAES.size(192);
+  enc = GibberishAES.enc("I can't decide!!!", "whatever");
+  GibberishAES.dec(enc, "whatever");
+
+</script>

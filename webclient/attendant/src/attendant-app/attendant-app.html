@@ -6,6 +6,7 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
+<script src="script/aes.js"></script>
 <script src="script/properties.js"></script>
 
 <dom-module id="attendant-app">
@@ -24,16 +25,30 @@
       }
       .slot{
         width : 120px;
-        height : 180px;
-        background-color: #A6D971;
+        height : 150px;
+        color : black;
+        background-color: white;
         border-style: solid;
         border-width: 2px;
         border-color: black;
         border-radius: 5px;
+        margin-bottom: 5px;
         display: inline-block;
       }
       .slot.state_t{
-        background-color: #E8553F;
+        background-color: #ffff99;
+        color : black;
+      }
+      .slot.state_p{
+        background-image: url("../../imgs/car11.png");
+        background-repeat: no-repeat;
+        background-size: 100%;
+        background-color: #ffff99;
+
+        background-position: 50% 40px;
+        color:black;
+        font-size: 16px;
+        font-weight: bold;
       }
       carInfo{
         display: block;
@@ -66,6 +81,15 @@
         last-response="{{monitor}}">
     </iron-ajax>
 
+    <iron-ajax
+        auto
+        id = "heartAjax"
+        url="{{ip}}/api/attendant/heartbeat"
+        handle-as="json"
+        on-response="heartResponse"
+        last-response="{{heartbeat}}">
+    </iron-ajax>
+
     <div id="app">
 
       <paper-card id="atd_img" image="imgs/surepark.jpg">
@@ -79,7 +103,7 @@
           Attendant Check In
         </div>
         <div class="card-actions">
-
+          {{rsvNum_e}}
           <paper-input id="rsvNum" label="Reservation Number"></paper-input>
           <paper-button on-tap="submitRsvNum" raised>Submit</paper-button>
           Result : {{response}}
@@ -90,6 +114,7 @@
       <paper-card>
         <div class="card-content">
           Facility Monitoring
+          <!-- facility status -->
           <template is="dom-if" if="{{monitor}}" restamp="true">
             <b class="alive">Server Alive!</b>
           </template>
@@ -101,29 +126,79 @@
         <div class="card-actions">
           <template is="dom-repeat" items="{{monitor}}">
             <!-- {{item.parkingslot_state}} -->
-            <template is="dom-if" if="{{pstatus(item.parkingslot_state)}}">
+            <template is="dom-if" if="{{rstatus_t(item)}}">
               <div class="slot state_t">
                 <div role="listbox">
-                  <paper-item >ID : {{item.parkingslot_id}}</paper-item>
-                  <paper-item>Floor : {{item.parkingslot_floor}}</paper-item>
-                  <paper-item>Zone : {{item.parkingslot_zone}}</paper-item>
-                  <paper-item>State : {{item.parkingslot_state}}</paper-item>
+                  <!-- <paper-item >ID : {{item.slot.parkingslot_id}}</paper-item>
+                  <paper-item>Floor : {{item.slot.parkingslot_floor}}</paper-item>
+                  <paper-item>Zone : {{item.slot.parkingslot_zone}}</paper-item> -->
+                  <paper-item>
+                    {{item.slot.parkingfacility_id}} -
+                    {{item.slot.parkingslot_floor}} -
+                    {{item.slot.parkingslot_zone}} -
+                    {{item.slot.parkingslot_id}}
+                  </paper-item>
+
+
                 </div>
               </div>
             </template>
-            <template is="dom-if" if="{{!pstatus(item.parkingslot_state)}}">
+            <template is="dom-if" if="{{rstatus_f(item)}}">
               <div class="slot state_f">
                 <div role="listbox">
-                  <paper-item >ID : {{item.parkingslot_id}}</paper-item>
-                  <paper-item>Floor : {{item.parkingslot_floor}}</paper-item>
-                  <paper-item>Zone : {{item.parkingslot_zone}}</paper-item>
-                  <paper-item>State : {{item.parkingslot_state}}</paper-item>
+                  <!-- <paper-item >ID : {{item.slot.parkingslot_id}}</paper-item>
+                  <paper-item>Floor : {{item.slot.parkingslot_floor}}</paper-item>
+                  <paper-item>Zone : {{item.slot.parkingslot_zone}}</paper-item> -->
+
+                  <paper-item>
+                    {{item.slot.parkingfacility_id}} -
+                    {{item.slot.parkingslot_floor}} -
+                    {{item.slot.parkingslot_zone}} -
+                    {{item.slot.parkingslot_id}}
+                  </paper-item>
+                </div>
+              </div>
+            </template>
+            <template is="dom-if" if="{{pstatus(item)}}">
+              <div class="slot state_p">
+                <div role="listbox">
+                  <!-- <paper-item >ID : {{item.slot.parkingslot_id}}</paper-item>
+                  <paper-item>Floor : {{item.slot.parkingslot_floor}}</paper-item>
+                  <paper-item>Zone : {{item.slot.parkingslot_zone}}</paper-item> -->
+                  <paper-item>
+                    {{item.slot.parkingfacility_id}} -
+                    {{item.slot.parkingslot_floor}} -
+                    {{item.slot.parkingslot_zone}} -
+                    {{item.slot.parkingslot_id}}
+                  </paper-item>
                 </div>
               </div>
             </template>
 
           </template>
 
+        </div>
+      </paper-card>
+      <paper-card>
+        <div class="card-content">
+          <b>Sensor Detecting</b>
+          <template is="dom-if" if="{{heart_t(heartbeat)}}" restamp="true">
+            <b class="alive">Sensor Alive</b>
+          </template>
+        </div>
+        <div class="card-actions">
+          <template is="dom-repeat" items="{{heartbeat}}">
+            <template is="dom-if" if="{{!heart_t(heartbeat)}}" restamp="true">
+              <b class="dead"><h2>Sensor Problem</h2></b>
+              <div role="listbox">
+                <paper-item>
+                  ID : {{item.parkingfacility_id}}
+                  Floor : {{item.parkingslot_floor}}
+                  Zone : {{item.parkingslot_zone}}
+                </paper-item>
+              </div>
+            </template>
+          </template>
         </div>
       </paper-card>
     </div>
@@ -137,7 +212,7 @@
     </paper-dialog>
 
     <paper-dialog id="dialog_f">
-      <h2>Check In failure!</h2>
+      <h2>Check In Failure!</h2>
 
       <div class="buttons">
         <paper-button dialog-confirm>Accept</paper-button>
@@ -161,7 +236,8 @@
         // Monitor every 2 seconds
         // console.log(properties.ip);
         this.ip = properties.ip;
-        this.set('interval', setInterval(this.interval.bind(this), 2000));
+        this.set('req_monitor', setInterval(this.req_monitor.bind(this), 1000));
+        this.set('req_heartbeart', setInterval(this.req_heartbeart.bind(this), 60000));
       },
       submitRsvNum: function(){
         var rsvNum = this.$.rsvNum.value;
@@ -181,13 +257,41 @@
 
       },
       interval : function(){
+
+      },
+      req_monitor : function(){
+        console.log("monitor request");
         this.$.monitorAjax.generateRequest();
       },
+      req_heartbeart : function(){
+        this.$.heartAjax.generateRequest();
+      },
+      rstatus_t : function(item){
+        return item.count === "resv";
+      },
+      rstatus_f : function(item){
+        return !item.count;
+      },
       pstatus : function(item){
-        var result = (item === true);
-        console.log(result);
-        return result;
+        return item.count === "parking";
+        // return false;
+      },
+      heartResponse : function(){
+        var heartbeat = this.$.heartAjax.lastResponse;
+        console.log("heartbeat : " + heartbeat);
+        this.heartbeat = heartbeat;
+      },
+      heart_t: function(sensor){
+        console.log("heartbeat : " + sensor);
+        return sensor === 'alive';
       }
+      // ,
+      // heart_s: function(sensor){
+      //   console.log("fail sensors : " + sensor.length);
+      //   var length = sensor.length;
+      //   return length >= 1;
+      //
+      // }
 
     });
 

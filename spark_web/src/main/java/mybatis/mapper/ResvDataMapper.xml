@@ -403,4 +403,15 @@
 	</select>
 	
 	
+	<select id="FindResvState" parameterType="Integer" resultType="String">
+		select
+			resv_cancel
+		from
+			t_resv
+		where
+			parkingslot_seq = #{parkingslot_seq}
+		and
+			(resv_cancel = "resv" or resv_cancel = "parking") 
+	</select>
+	
 </mapper> 

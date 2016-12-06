@@ -18,7 +18,7 @@
 		set
 			admin_token = #{admin_token}
 		where 
-			admin_id=#{admin_id}
+			admin_id = #{admin_id}
 	</update>
 
 	<select id="FindAdminToken" parameterType="String" resultType="String">

@@ -28,14 +28,6 @@ public class ResvDAO {
 
 	}
 
-	public static SqlSessionFactory getSqlSessionFactory() {
-		return sqlSessionFactory;
-	}
-
-	public static void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-		ResvDAO.sqlSessionFactory = sqlSessionFactory;
-	}
-
 	public int FindMaximumResvid() {
 
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -88,7 +80,7 @@ public class ResvDAO {
 
 	}
 
-	// ÀÎÁõ¹øÈ£·Î Á¤º¸ Á¶È¸
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¸
 	public Result_Resv_Info FindResvAuthenticationInfo(String resv_authenticationnum) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -102,7 +94,7 @@ public class ResvDAO {
 
 	}
 
-	// ½½·ÔÀÇ ÀÎÁõ¹øÈ£ Á¶È¸
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È£ ï¿½ï¿½È¸
 	public String FindResvAuthenticationNum(int parkingslot_seq) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -115,7 +107,7 @@ public class ResvDAO {
 		}
 	}
 
-	// ekfms tkfka½½·Ô ¾÷µ¥ÀÌÆ®
+	// ekfms tkfkaï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 	public void UpdateParkingSlotSeq(Resv otherreallocateuserresv) {
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ResvMapper mapper = session.getMapper(ResvMapper.class);
@@ -126,7 +118,7 @@ public class ResvDAO {
 		}
 	}
 
-	// Â÷¶ûÀÌ ÁÖÂ÷ÇÒ ¶§
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 	public void UpdateParkingStartTime(Resv resv) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -138,7 +130,7 @@ public class ResvDAO {
 
 	}
 
-	// Â÷¶ûÀÌ ÁÖÂ÷Àå¿¡¼­ ÀÌµ¿ÇÒ¶§
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½å¿¡ï¿½ï¿½ ï¿½Ìµï¿½ï¿½Ò¶ï¿½
 	public void UpdateParkingStatetoMoving(Resv resv) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -161,7 +153,7 @@ public class ResvDAO {
 		}	
 	}
 
-	// Â÷·®ÀÌ ÁÖÂ÷Àå ³ª°¥¶§
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	public void UpdateParkingExitTime(Resv resv) {
 		// TODO Auto-generated method stub
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -283,5 +275,16 @@ public class ResvDAO {
 			// TODO: handle exception
 			return 0;
 		}
+	}
+
+	public String FindResvState(int parkingslot_seq) {
+		// TODO Auto-generated method stub
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ResvMapper mapper = session.getMapper(ResvMapper.class);
+			return mapper.FindResvState(parkingslot_seq);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return "empty";
+		}	
 	}
 }

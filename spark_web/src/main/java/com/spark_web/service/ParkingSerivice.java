@@ -1,32 +1,54 @@
 package com.spark_web.service;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import com.spark_web.dao.HeartbeatLogDAO;
 import com.spark_web.dao.ParkingfacilityDAO;
 import com.spark_web.dao.ParkingslotDAO;
 import com.spark_web.dao.ResvDAO;
+import com.spark_web.domain.HeartbeatLog;
+import com.spark_web.domain.Pair;
 import com.spark_web.domain.ParkingFacility;
 import com.spark_web.domain.ParkingSlot;
 import com.spark_web.domain.Result_Resv_Info;
 import com.spark_web.domain.Resv;
+import com.spark_web.util.AES256Cipher;
 
 public class ParkingSerivice extends PushNotificationService {
 
 	public static ResvDAO resvdao = new ResvDAO();
 	public static ParkingslotDAO parkingslotdao = new ParkingslotDAO();
 	public static ParkingfacilityDAO parkingfacilitydao = new ParkingfacilityDAO();
+	public static HeartbeatLogDAO heartbeatlogdao = new HeartbeatLogDAO();
 
-	public String authentication(String resv_authenticationnum) {
+	public String authentication(String resv_authenticationnum)
+			throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException,
+			InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		// TODO Auto-generated method stub
+
+		AES256Cipher a256 = AES256Cipher.getInstance();
+
+		String authenticationnum = a256.AES_Encode(resv_authenticationnum);
+
 		Result_Resv_Info result_resv = new Result_Resv_Info();
-		result_resv = resvdao.FindResvAuthenticationInfo(resv_authenticationnum);
+		result_resv = resvdao.FindResvAuthenticationInfo(authenticationnum);
 
 		if (result_resv != null) {
-			//인증해서 게이트 열라고 보냄
+			// 인증해서게이트열라고보냄
 			PushNotification(result_resv.getParkingfacility_id() + "-" + result_resv.getParkingslot_floor() + "-"
-					+ result_resv.getParkingslot_zone(), resv_authenticationnum);
+					+ result_resv.getParkingslot_zone(), authenticationnum);
 
 			return "success";
 		} else {
@@ -35,7 +57,8 @@ public class ParkingSerivice extends PushNotificationService {
 
 	}
 
-	public String UpdateParkingSlot(String message) {
+	public String UpdateParkingSlot(String message) throws IOException, InvalidKeyException, NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		// TODO Auto-generated method stub
 		String[] message_parsing1 = message.split(",");
 		String[] message_parsing2 = message_parsing1[1].split(":");
@@ -55,122 +78,121 @@ public class ParkingSerivice extends PushNotificationService {
 		result_resv.setParkingslot_id(parkingslot_id);
 		result_resv.setResv_authenticationnum(resv_authenticationnum);
 
-		int parkingslotseq = parkingslotdao.FindResvParkingSlotSeq(result_resv);//주차한 곳의 seq
+		int parkingslotseq = parkingslotdao.FindResvParkingSlotSeq(result_resv);// 주차한곳의seq
 
 		SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		Date currentdate = new Date();
 		String date = mSimpleDateFormat.format(currentdate);
 
-		try {
-			if (parking_state.equals("1")) {//입장한 상황
+		AES256Cipher a256 = AES256Cipher.getInstance();
+		if (resv_authenticationnum.equals("HEARTBEAT")) {
+			return RecordHeartBeat(parkingfacility_id, parkingslot_floor, parkingslot_zone, date);
+
+		} else if (resv_authenticationnum.equals("MOVE")) {
+			Resv resv = new Resv();
+			resv.setParkingslot_seq(parkingslotseq);
+			resv.setResv_cancel("MOVE," + parkingfacility_id + "-" + parkingslot_floor + "-" + parkingslot_zone);
+			resvdao.UpdateParkingStatetoMoving(resv);
+
+		} else if (resv_authenticationnum.equals("PAYMENT")) {
+			// payment and exit
+			int parking_price = 0;
+
+			ParkingFacility parkingfacility = new ParkingFacility();
+			parkingfacility = parkingfacilitydao.FindParkingFacilityInfo(Integer.parseInt(parkingfacility_id));
+
+			int am_price = parkingfacility.getParkingfacility_am_price();
+			int pm_price = parkingfacility.getParkingfacility_pm_price();
+
+			Resv resv = new Resv();
+			resv = resvdao.FindParkingSlotStateMoving(
+					"MOVE," + parkingfacility_id + "-" + parkingslot_floor + "-" + parkingslot_zone);
+
+			parking_price = CalculatePay(resv.getParking_starttime(), date, am_price, pm_price);
+
+			resv.setParking_exittime(date);
+			resv.setParking_price(parking_price);
+			resv.setResv_cancel("MOVE," + parkingfacility_id + "-" + parkingslot_floor + "-" + parkingslot_zone);
+
+			resvdao.UpdateParkingExitTime(resv);
+			parkingslotdao.UpdateParkingSlotEmptyStatus(resv.getParkingslot_seq());
+
+			PaymentService payment = new PaymentService();
+			System.out.println(parking_price);
+			payment.payment(a256.AES_Decode(resv.getResv_authenticationnum()), parking_price);
+
+		} else {
+			if (parking_state.equals("1")) {// 입장한상황
 				// in
-				if (resv_authenticationnum.equals("MOVE") || resv_authenticationnum.equals("")) {
-					//에러처리
-				} else {//주차상황
-					
-					if (parkingslotseq != -1) {//에러체크
-										
-						Result_Resv_Info compareresultresv = new Result_Resv_Info();//원래 주차해야되는 곳의 seq정보를 받아오기
-						compareresultresv = resvdao.FindResvAuthenticationInfo(resv_authenticationnum);												
-						int originalparkingslotseq = parkingslotdao.FindResvParkingSlotSeq(compareresultresv);//원래 주차해야하는 곳의 seq
-						
-						if (parkingslotseq != originalparkingslotseq) { //주차한 곳과 예약 정보가 다르면
+
+				if (resv_authenticationnum.equals("")) {
+					// 에러처리
+					return "error";
+				} else {// 주차상황
+
+					if (parkingslotseq != -1) {// 에러체크
+
+						Result_Resv_Info compareresultresv = new Result_Resv_Info();// 원래주차해야되는곳의seq정보를받아오기
+						compareresultresv = resvdao.FindResvAuthenticationInfo(resv_authenticationnum);
+						int originalparkingslotseq = parkingslotdao.FindResvParkingSlotSeq(compareresultresv);// 원래주차해야하는곳의seq
+
+						if (parkingslotseq != originalparkingslotseq) { // 주차한곳과예약정보가다르면
 							// 재할당
-							int parkingslotstate = parkingslotdao.FindResvParkingSlotState(parkingslotseq);//주차된 공간이 이미 예약되어 있는 지 확인
-							
-							if (parkingslotstate != -1) {//에러체크
+							int parkingslotstate = parkingslotdao.FindResvParkingSlotState(parkingslotseq);// 주차된공간이이미예약되어있는지확인
+
+							if (parkingslotstate != -1) {// 에러체크
 								if (parkingslotstate == 1) {
-									// 자리가 예약되어 있는 곳에 주차
-									// 서로 예약 자리만 교환
-			
+									// 자리가예약되어있는곳에주차
+									// 서로예약자리만교환
+
 									String otherreallocateuserauthenticationnum = resvdao
-											.FindResvAuthenticationNum(parkingslotseq);//지금 주차한 seq에 저장되어있는 인증번호
+											.FindResvAuthenticationNum(parkingslotseq);// 지금주차한seq에저장되어있는인증번호
 									Resv otherreallocateuserresv = new Resv();
-									otherreallocateuserresv.setParkingslot_seq(originalparkingslotseq);//주차한 사람이 원래 주차해야할 공간 입력
+									otherreallocateuserresv.setParkingslot_seq(originalparkingslotseq);// 주차한사람이원래주차해야할공간입력
 									otherreallocateuserresv
-											.setResv_authenticationnum(otherreallocateuserauthenticationnum);//지금 주차된 공간의 원래 주인의 인증번호 입력
-						
-									resvdao.UpdateParkingSlotSeq(otherreallocateuserresv);//지금 주차한곳의 원래 주인에게 내가 주차해야할곳으로 변경해서 업데이트
-									
+											.setResv_authenticationnum(otherreallocateuserauthenticationnum);// 지금주차된공간의원래주인의인증번호입력
+
+									resvdao.UpdateParkingSlotSeq(otherreallocateuserresv);// 지금주차한곳의원래주인에게내가주차해야할곳으로변경해서업데이트
+
 									Result_Resv_Info otheruserresv = new Result_Resv_Info();
 									otheruserresv = resvdao
-											.FindResvAuthenticationInfo(otherreallocateuserauthenticationnum);//그 유저의 정보 받아오기
-									System.out.println(otherreallocateuserauthenticationnum);
-									PushNotification(otherreallocateuserauthenticationnum,
+											.FindResvAuthenticationInfo(otherreallocateuserauthenticationnum);// 그유저의정보받아오기
+									String otherauthenticationnum = a256
+											.AES_Decode(otherreallocateuserauthenticationnum);
+									System.out.println(otherauthenticationnum);// 입장한차량인증번호
+									PushNotification(otherauthenticationnum,
 											"reallocation:" + otheruserresv.getParkingfacility_id() + "-"
 													+ otheruserresv.getParkingslot_floor() + "-"
 													+ otheruserresv.getParkingslot_zone() + "-"
-													+ otheruserresv.getParkingslot_id());//푸쉬로 새로 갱신된 예약정보 푸시
+													+ otheruserresv.getParkingslot_id());// 푸쉬로새로갱신된예약정보푸시
 
 								} else {
-									// 자리가 비어있는 곳에 주차
-									parkingslotdao.UpdateParkingSlotEmptyStatus(originalparkingslotseq);//기존 seq 비우고
-									parkingslotdao.UpdateParkingSlotResvStatus(parkingslotseq);//ㅅㅐ로운 seq채우고
-								
+									// 자리가비어있는곳에주차
+									parkingslotdao.UpdateParkingSlotEmptyStatus(originalparkingslotseq);// 기존seq비우고
+									parkingslotdao.UpdateParkingSlotResvStatus(parkingslotseq);// ㅅㅐ로운seq채우고
+
 								}
 							}
-							System.out.println(resv_authenticationnum);//입장한 차량 인증번호
-							PushNotification(resv_authenticationnum, "reallocation:" + message_parsing2[0]);//입장한 차량으로 재할당 메세지
-							//주차 시작으로 업데이트
-							
-						} 
-						//주차 시작으로 업데이트
-						Resv resv = new Resv();//실제로 주차된 곳 정보
+
+							String authenticationnum = a256.AES_Decode(resv_authenticationnum);
+							System.out.println(authenticationnum);// 입장한차량인증번호
+							PushNotification(authenticationnum, "reallocation:" + message_parsing2[0]);// 입장한차량으로재할당메세지
+
+						}
+						// 주차시작으로업데이트
+						Resv resv = new Resv();// 실제로 주차된 곳 정보
 						resv.setParkingslot_seq(parkingslotseq);
 						resv.setResv_authenticationnum(resv_authenticationnum);
-						resv.setParking_starttime(date);//주차 시작 날짜 입력
-						resv.setResv_cancel("parking");//주차 상태 입력
-						resvdao.UpdateParkingStartTime(resv);//업데이트
-						
+						resv.setParking_starttime(date);// 주차시작날짜입력
+						resv.setResv_cancel("parking");// 주차상태입력
+						resvdao.UpdateParkingStartTime(resv);// 업데이트
 					}
 				}
 
-			} else {
-				// out
-				//주차상태를 벗어남
-				if (resv_authenticationnum.equals("MOVE")) {
-					Resv resv = new Resv();
-					resv.setParkingslot_seq(parkingslotseq);
-					resv.setResv_cancel("MOVE,"+ parkingfacility_id + "-" + parkingslot_floor + "-" + parkingslot_zone);
-					resvdao.UpdateParkingStatetoMoving(resv);
-				} else if (resv_authenticationnum.equals("PAYMENT")) {
-					// 나갈라고 게이트 앞으로 온 상황
-					// payment and exit
-					// 결제 계산할 거 생각해봐야겠음 거지 같이 다 받아와야함
-					int parking_price = 0;
-					
-					ParkingFacility parkingfacility = new ParkingFacility();
-					parkingfacility = parkingfacilitydao.FindParkingFacilityInfo(Integer.parseInt(parkingfacility_id));
-					
-					int am_price = parkingfacility.getParkingfacility_am_price();
-					int pm_price = parkingfacility.getParkingfacility_pm_price();
-					
-					Resv resv = new Resv();
-					resv = resvdao.FindParkingSlotStateMoving("MOVE,"+ parkingfacility_id + "-" + parkingslot_floor + "-" + parkingslot_zone);
-					
-					parking_price = CalculatePay(resv.getParking_starttime(), date, am_price, pm_price);
-
-					resv.setParking_exittime(date);
-					resv.setParking_price(parking_price);
-					resv.setResv_cancel("MOVE,"+ parkingfacility_id + "-" + parkingslot_floor + "-" + parkingslot_zone);
-					
-					resvdao.UpdateParkingExitTime(resv);
-					parkingslotdao.UpdateParkingSlotEmptyStatus(resv.getParkingslot_seq());
-
-					PaymentService payment = new PaymentService();
-					System.out.println(parking_price);
-					payment.payment(resv.getResv_authenticationnum(), parking_price);
-
-				} else {
-					System.out.println("Error");
-				}
 			}
-			return "success";
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			return "fail";
 		}
+		return "success";
+
 	}
 
 	public int CalculatePay(String starttime, String exittime, int am_price, int pm_price) {
@@ -230,9 +252,45 @@ public class ParkingSerivice extends PushNotificationService {
 		return totalpay;
 
 	}
-	
-	public List<ParkingSlot> ParkingSlotList() {
+
+	public ArrayList<Pair<ParkingSlot, String>> ParkingSlotList() {
 		// TODO Auto-generated method stub
-		return parkingslotdao.FindParkingSlotInfo();
+		ArrayList<Pair<ParkingSlot, String>> ParkingSlotStatelist = new ArrayList<>();
+		List<ParkingSlot> parkingslotlist = parkingslotdao.FindParkingSlotInfo();
+		for (int i = 0; i < parkingslotlist.size(); i++) {
+			String resvcancel = resvdao.FindResvState(parkingslotlist.get(i).getParkingslot_seq());
+			Pair<ParkingSlot, String> p = new Pair<>(parkingslotlist.get(i), resvcancel);
+			ParkingSlotStatelist.add(i, p);
+		}
+
+		return ParkingSlotStatelist;
+	}
+
+	public String RecordHeartBeat(String parkingfacility_id, String parkingslot_floor, String parkingslot_zone,
+			String date) throws IOException {
+		// TODO Auto-generated method stub
+
+		HeartbeatLog heartbeatlog = new HeartbeatLog();
+
+		heartbeatlog.setParkingfacility_id(Integer.parseInt(parkingfacility_id));
+		heartbeatlog.setParkingslot_floor(parkingslot_floor);
+		heartbeatlog.setParkingslot_zone(parkingslot_zone);
+		heartbeatlog.setDate(date);
+
+		if (heartbeatlogdao.UpdateHeartbeatLog(heartbeatlog)) {
+			return "success";
+		} else {
+			return "fail";
+		}
+	}
+
+	public List<HeartbeatLog> CheckHeartBeat() {
+		// TODO Auto-generated method stub
+		List<HeartbeatLog> heartbeatlog = heartbeatlogdao.FindHeartbeatLog();
+		if (1 > heartbeatlog.size()) {
+			return null;
+		} else {
+			return heartbeatlog;
+		}
 	}
 }

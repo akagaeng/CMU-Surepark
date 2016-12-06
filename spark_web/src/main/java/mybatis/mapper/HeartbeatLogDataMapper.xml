@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.spark_web.dao.HeartbeatLogMapper">
+	
+	<update id="UpdateHeartbeatLog" parameterType="com.spark_web.domain.HeartbeatLog">
+		update 
+			t_heartbeatlog 
+		set
+			heartbeatlog_datetime = #{date}
+		where 
+			parkingfacility_id = #{parkingfacility_id}
+		and
+			parkingslot_floor = #{parkingslot_floor}
+		and
+			parkingslot_zone = #{parkingslot_zone}
+	</update>
+	
+	<select id="FindHeartbeatLog" parameterType="Integer" resultType="com.spark_web.domain.HeartbeatLog">
+		select
+			parkingfacility_id,
+			parkingslot_floor,
+			parkingslot_zone
+		from 
+			t_heartbeatlog
+		where 
+			now()  <![CDATA[>=]]>  DATE_ADD(heartbeatlog_datetime, Interval 35 MINUTE)
+	</select>
+	
+</mapper> 

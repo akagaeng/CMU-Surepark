@@ -1,22 +1,30 @@
 package com.spark_web.service;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import com.spark_web.dao.ParkingslotDAO;
 import com.spark_web.dao.ResvDAO;
 import com.spark_web.domain.Result_Resv_Info;
 import com.spark_web.domain.Resv;
 import com.spark_web.domain.Send_Resv_Info;
+import com.spark_web.util.AES256Cipher;
 
 public class ReservationService {
 
 	public static ParkingslotDAO parkingslotdao = new ParkingslotDAO();
 	public static ResvDAO resvdao = new ResvDAO();
 	
-	public Result_Resv_Info Reservation(Send_Resv_Info send_resv) throws IOException {
+	public Result_Resv_Info Reservation(Send_Resv_Info send_resv) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		// TODO Auto-generated method stub
 		int parkingslot = parkingslotdao.FindAvailableParkingSlot();	
 		if(parkingslot == -1){
@@ -33,7 +41,9 @@ public class ReservationService {
 			    result = result - 1000;
 			}
 			
-			int authenticationnum = currentresvid+result;
+			AES256Cipher a256 = AES256Cipher.getInstance();
+			
+			String authenticationnum = a256.AES_Encode(currentresvid+result+"");
 			
 			SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat ( "yyyy-MM-dd");
 			Date currentdate = new Date();
@@ -44,13 +54,17 @@ public class ReservationService {
 			resv.setResv_phonenum(send_resv.getResv_phonenum());
 			resv.setResv_creditnum(send_resv.getResv_creditnum());
 			resv.setResv_starttime(date+" "+send_resv.getResv_starttime());
-			resv.setResv_authenticationnum(authenticationnum+"");
+			resv.setResv_authenticationnum(authenticationnum);			
 			
-			if(resvdao.InsertResv(resv) && parkingslotdao.UpdateParkingSlotResvStatus(parkingslot)){
-				return resvdao.FindResv(resv.getResv_phonenum());
-			}else{
-				return null;
-			}
+			if(resvdao.FindResv(resv.getResv_phonenum()) != null){
+	            return null;
+	         }else {
+	        	if(resvdao.InsertResv(resv) && parkingslotdao.UpdateParkingSlotResvStatus(parkingslot)){
+	               return resvdao.FindResv(resv.getResv_phonenum());
+	            }else{
+	               return null;
+	            }
+	         }
 		}
 			
 		
@@ -68,7 +82,6 @@ public class ReservationService {
 	
 	public Result_Resv_Info reservationcheck(String phonenumber) {
 		// TODO Auto-generated method stub
-		
 		return resvdao.FindResv(phonenumber); 
 		
 	}

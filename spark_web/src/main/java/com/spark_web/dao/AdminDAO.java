@@ -2,6 +2,7 @@ package com.spark_web.dao;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.PrivateKey;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -24,14 +25,6 @@ public class AdminDAO {
 			e.printStackTrace();
 		}
 
-	}
-
-	public static SqlSessionFactory getSqlSessionFactory() {
-		return sqlSessionFactory;
-	}
-
-	public static void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-		AdminDAO.sqlSessionFactory = sqlSessionFactory;
 	}
 
 	public boolean FindAdminData(String userid, String password) throws IOException {

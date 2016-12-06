@@ -1,5 +1,7 @@
 package com.spark_web.dao;
 
+import java.security.PrivateKey;
+
 import com.spark_web.domain.Admin;
 
 public interface AdminMapper {
@@ -11,5 +13,7 @@ public interface AdminMapper {
 	public String FindAdminToken(String token);
 
 	public void UpdateAdminlogout(String token);
+
+	public void UpdateAdminPrivatekey(PrivateKey privateKey);
 
 }

@@ -25,14 +25,7 @@ public class ParkingfacilityDAO {
 
 	}
 
-	public static SqlSessionFactory getSqlSessionFactory() {
-		return sqlSessionFactory;
-	}
-
-	public static void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-		ParkingfacilityDAO.sqlSessionFactory = sqlSessionFactory;
-	}
-
+	
 	public ParkingFacility FindParkingFacilityInfo(int parkingfacility_id) throws IOException {
 
 		try (SqlSession session = sqlSessionFactory.openSession()) {

@@ -49,4 +49,6 @@ public interface ResvMapper {
 
 	public double FindStaricalParkingOccupancyMonth(ParkingStaticalData parkingstaticaldata);
 
+	public String FindResvState(int parkingslot_seq);
+
 }

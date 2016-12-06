@@ -27,13 +27,6 @@ public class ParkingslotDAO {
 
 	}
 
-	public static SqlSessionFactory getSqlSessionFactory() {
-		return sqlSessionFactory;
-	}
-
-	public static void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-		ParkingslotDAO.sqlSessionFactory = sqlSessionFactory;
-	}
 
 	public int FindAvailableParkingSlot() throws IOException {
 
@@ -111,9 +104,9 @@ public class ParkingslotDAO {
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			// ParkingslotMapper mapper =
 			// session.getMapper(ParkingslotMapper.class);
-			// return mapper.FindParkingSlotInfo();//hashmapÀ¸·Î ÇÏ¸é list·Î ¹ÞÀ» ¼ö ÀÖÀ½
-			return session.selectList("FindParkingSlotInfo"); // mapper ¾È ¾²°í Á÷Á¢
-																// ÂüÁ¶
+			// return mapper.FindParkingSlotInfo();//hashmapï¿½ï¿½ï¿½ï¿½ ï¿½Ï¸ï¿½ listï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			return session.selectList("FindParkingSlotInfo"); // mapper ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+																// ï¿½ï¿½ï¿½ï¿½
 
 		} catch (Exception e) {
 			// TODO: handle exception

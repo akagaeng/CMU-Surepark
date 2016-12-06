@@ -9,7 +9,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 			<transactionManager type="JDBC" />
 			<dataSource type="POOLED">
 				<property name="driver" value="com.mysql.jdbc.Driver" />
-				<property name="url" value="jdbc:mysql://localhost:3306/dbparking" />
+				<property name="url" value="jdbc:mysql://192.168.1.167:3306/dbparking" />
 				<property name="username" value="root" />
 				<property name="password" value="root" />
 			</dataSource>
@@ -19,9 +19,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	<!-- UserMap.xml 등록 -->
 	<mappers>
 		<mapper resource="mybatis/mapper/AdminDataMapper.xml" />
+		<mapper resource="mybatis/mapper/HeartbeatLogDataMapper.xml" />
 		<mapper resource="mybatis/mapper/ParkingfacilityDataMapper.xml" />
-		<mapper resource="mybatis/mapper/ResvDataMapper.xml" />
 		<mapper resource="mybatis/mapper/ParkingslotDataMapper.xml" />
+		<mapper resource="mybatis/mapper/ResvDataMapper.xml" />
 	</mappers>
 
 </configuration> 

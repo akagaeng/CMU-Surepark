@@ -13,12 +13,13 @@ public class PushNotificationService {
 		String topic = "topic/";
 		// String content = "test";
 		int qos = 2;
-		String broker = "tcp://172.16.30.237:1883";
-		//String broker = "tcp://192.168.1.169:1883";
+		//String broker = "tcp://172.16.30.237:1883";
+		String broker = "tcp://192.168.1.166:1883";
 		//String broker = "tcp://128.237.135.101:1883";
 		String clientId = "Server";
 		MemoryPersistence persistence = new MemoryPersistence();
 
+		System.out.println(topic+publish);
 		try {
 			MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
 			MqttConnectOptions connOpts = new MqttConnectOptions();
